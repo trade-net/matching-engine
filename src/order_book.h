@@ -13,14 +13,14 @@ public:
 	bool addOrder(Order& order);
 
 private:
-	Limit buyTree;
-	Limit sellTree;
-	Limit lowestSell;
-	Limit highestBuy;
+	Limit* buyTree;
+	Limit* sellTree;
 	std::unordered_map<int, Limit*> limitMap;
 	std::unordered_map<int, Order*> orderMap;
 	bool isBuyTreeInitialised = false;
 	bool isSellTreeInitialised = false;
+
+	void addFirstOrderAtLimit(Order& order);
 };
 
 #endif
