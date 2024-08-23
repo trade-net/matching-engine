@@ -30,7 +30,7 @@ bool OrderBook::addOrder(Order& order)
 	{
 		Limit* limitPtr = it->second;
 		order.prevOrder = limitPtr->addOrderToLimit(order);
-		std::cout << "Added order to limit $" << order.limit << " size=" << limitPtr->size << " volume=" << limitPtr->volume << std::endl;
+		std::cout << "Added order to limit $" << order.limit << " size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
 
 	}
 	else
@@ -43,6 +43,8 @@ bool OrderBook::addOrder(Order& order)
 
 	return true;
 }
+
+bool OrderBook::executeOrder(Order& order);
 
 int main(){
 	OrderBook aapl;

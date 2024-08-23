@@ -1,9 +1,9 @@
 #ifndef INCLUDED_ORDER
 #define INCLUDED_ORDER
 
-struct Limit; //forward declaration
+class Limit; //forward declaration
 
-struct Order{
+class Order{
 	Order(int id, bool isBuy, int units, int limit, int timestamp)
 	: id(id)
 	, isBuy(isBuy)
