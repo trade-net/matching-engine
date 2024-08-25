@@ -10,16 +10,24 @@ void OrderBook::addFirstOrderAtLimit(Order& order)
 	if(order.isBuy)
 	{
 		limit = Limit::createFirstLimitAtPrice(order, buyTree);
+		if(limit->price() > highestBuy->price())
+		{
+			highestBuy = limit;
+		}
 	}
 	else
 	{
 		limit = Limit::createFirstLimitAtPrice(order, sellTree);
+		if(limit->price() < lowestSell->price())
+		{
+			lowestSell = limit;
+		}
 	}
 
 	order.parentLimit = limit;
 
 	limitMap.insert(std::pair<int, Limit*>(order.limit, limit));
-
+	
 	std::cout << "Added first order at limit $" << order.limit << std::endl;
 }
 
@@ -44,7 +52,41 @@ bool OrderBook::addOrder(Order& order)
 	return true;
 }
 
-bool OrderBook::executeOrder(Order& order);
+
+void OrderBook::removeUnits(int units, bool isBuy)
+{
+	if(isBuy)
+	{
+		Limit* current = highestBuy;
+		int unitsRemaining = units;
+		while(unitsRemaining > 0)
+		{
+			if(current->volume() >= unitsRemaining)
+			{
+				// remove from map
+				Order* currentOrder = current->headOrder();
+				Order* orderToDelete = nullptr;
+				while(currentOrder)
+				{
+					orderToDelete = currentOrder;
+					orderMap.erase(currentOrder->id);
+					currentOrder = currentOrder->nextOrder;
+					delete orderToDelete;
+				}
+				current = Limit::removeLimit(current);
+			}
+			else
+			{
+				current.removeFirstNOrders(unitsRemaining);
+			}
+		}
+	}
+}
+
+void OrderBook::removeUnitsWithLimit(int units, bool isBuy, int limit)
+{
+
+}
 
 int main(){
 	OrderBook aapl;

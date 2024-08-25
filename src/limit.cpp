@@ -68,3 +68,8 @@ Limit* Limit::createFirstLimitAtPrice(Order& order, Limit*& root)
 
 }
 
+Order* Limit::removeLimit(Limit* limit)
+{
+	parent->leftChild = (limit->rightChild ? limit->rightChild : nullptr);
+	return parent;
+}

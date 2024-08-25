@@ -9,12 +9,15 @@
 class OrderBook{
 public:
 	OrderBook();
-
 	bool addOrder(Order& order);
+	void removeUnits(int units);
+	void removeUnitsWithLimit(int units, int limit);
 
 private:
 	Limit* buyTree;
 	Limit* sellTree;
+	Limit* lowestSell;
+	Limit* highestBuy;
 	std::unordered_map<int, Limit*> limitMap;
 	std::unordered_map<int, Order*> orderMap;
 	bool isBuyTreeInitialised = false;
