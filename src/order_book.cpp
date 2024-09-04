@@ -55,30 +55,41 @@ bool OrderBook::addOrder(Order& order)
 
 void OrderBook::removeUnits(int units, bool isBuy)
 {
+	Limit* current;
 	if(isBuy)
 	{
-		Limit* current = highestBuy;
-		int unitsRemaining = units;
-		while(unitsRemaining > 0)
+		current = highestBuy;
+	}
+	else
+	{
+		current = lowestSell;
+	}
+
+	while(units > 0)
+	{
+		if(current->volume() >= units)
 		{
-			if(current->volume() >= unitsRemaining)
+			Order* currentOrder = current->headOrder();
+			Order* orderToDelete = nullptr;
+			while(currentOrder)
 			{
-				// remove from map
-				Order* currentOrder = current->headOrder();
-				Order* orderToDelete = nullptr;
-				while(currentOrder)
-				{
-					orderToDelete = currentOrder;
-					orderMap.erase(currentOrder->id);
-					currentOrder = currentOrder->nextOrder;
-					delete orderToDelete;
-				}
-				current = Limit::removeLimit(current);
+				orderToDelete = currentOrder;
+				orderMap.erase(currentOrder->id);
+				currentOrder = currentOrder->nextOrder;
+				delete orderToDelete;
 			}
-			else
-			{
-				current.removeFirstNOrders(unitsRemaining);
-			}
+
+			Limit* limitToDelete = current;
+			current = current->removeLimit(isBuy);
+
+			units -= limitToDelete->volume();
+			limitMap.erase(limitToDelete->price());
+			delete limitToDelete;
+		}
+		else
+		{
+			//current->removeFirstNOrders(units);
+			units = 0;
 		}
 	}
 }

@@ -4,6 +4,7 @@
 class Limit; //forward declaration
 
 class Order{
+public:
 	Order(int id, bool isBuy, int units, int limit, int timestamp)
 	: id(id)
 	, isBuy(isBuy)

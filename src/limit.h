@@ -13,6 +13,8 @@ public:
 
 	static Limit* createFirstLimitAtPrice(Order& order, Limit*& root);
 
+	Limit* removeLimit(bool isBuy);
+
 	int price() const{
 		return s_price;
 	}
@@ -23,6 +25,10 @@ public:
 
 	int volume() const{
 		return s_volume;
+	}
+
+	Order* headOrder(){
+		return s_headOrder;
 	}
 
 private:
