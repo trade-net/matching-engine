@@ -53,6 +53,7 @@ bool OrderBook::addOrder(Order& order)
 }
 
 
+// isBuy tells us whether we're removing from the buyTree or sellTree
 void OrderBook::removeUnits(int units, bool isBuy)
 {
 	Limit* current;
@@ -65,10 +66,16 @@ void OrderBook::removeUnits(int units, bool isBuy)
 		current = lowestSell;
 	}
 
+	// Assuming units to remove always <= total limit orders in the tree
+	// While there are still units to remove
 	while(units > 0)
 	{
-		if(current->volume() >= units)
+		// if the volume of the current limit is less than the number of units to delete
+		// remove the whole limit from the tree
+		if(units >= current->volume())
 		{
+			// iterate through the orders in the limit and delete them from the map
+			// clean up their memory
 			Order* currentOrder = current->headOrder();
 			Order* orderToDelete = nullptr;
 			while(currentOrder)
@@ -79,6 +86,7 @@ void OrderBook::removeUnits(int units, bool isBuy)
 				delete orderToDelete;
 			}
 
+			// remove the limit from the tree and map, clean up memory
 			Limit* limitToDelete = current;
 			current = current->removeLimit(isBuy);
 
@@ -86,10 +94,37 @@ void OrderBook::removeUnits(int units, bool isBuy)
 			limitMap.erase(limitToDelete->price());
 			delete limitToDelete;
 		}
+
+		// if not, remove the remaining units from the current limit
 		else
 		{
-			//current->removeFirstNOrders(units);
-			units = 0;
+			// starting from the head order
+			Order* currentOrder = current->headOrder();
+			Order* orderToDelete = nullptr;
+			while(units)
+			{
+				// if more units to delete than that of the current order
+				// can just delete the order and update the doubly linked list
+				if(units >= currentOrder->units())
+				{
+					// decrement the units remaining
+					units -= currentOrder->units();	
+					orderToDelete = currentOrder;
+					orderMap.erase(currentOrder->id);
+
+					// update headOrder and nextOrder's prevOrder
+					currentOrder->nextOrder->prevOrder = nullptr;
+					currentOrder = currentOrder->nextOrder;
+					current->setHeadOrder(currentOrder);
+					delete orderToDelete;
+				}
+				// if not, subtract the remaining units from the current order
+				else
+				{
+					currentOrder.units -= units;
+					units = 0;
+				}
+			}
 		}
 	}
 }
