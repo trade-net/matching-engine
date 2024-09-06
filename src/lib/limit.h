@@ -1,7 +1,7 @@
 #ifndef INCLUDED_LIMIT
 #define INCLUDED_LIMIT
 
-#include "order.h"
+#include <order.h>
 
 class Limit{
 public:
@@ -27,8 +27,13 @@ public:
 		return s_volume;
 	}
 
-	Order* headOrder(){
+	Order* headOrder() const{
 		return s_headOrder;
+	}
+
+	void setHeadOrder(Order* order)
+	{
+		s_headOrder = order;
 	}
 
 private:
