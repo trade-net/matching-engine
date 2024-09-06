@@ -10,8 +10,7 @@ class OrderBook{
 public:
 	OrderBook();
 	bool addOrder(Order& order);
-	void removeUnits(int units, bool isBuy);
-	void removeUnitsWithLimit(int units, bool isBuy, int limit);
+	int removeUnits(int units, bool isBuy, int limit);
 
 private:
 	Limit* buyTree;

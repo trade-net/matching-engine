@@ -54,7 +54,7 @@ bool OrderBook::addOrder(Order& order)
 
 
 // isBuy tells us whether we're removing from the buyTree or sellTree
-void OrderBook::removeUnits(int units, bool isBuy)
+int OrderBook::removeUnits(int units, bool isBuy, int limit=0)
 {
 	Limit* current;
 	if(isBuy)
@@ -66,9 +66,10 @@ void OrderBook::removeUnits(int units, bool isBuy)
 		current = lowestSell;
 	}
 
-	// Assuming units to remove always <= total limit orders in the tree
 	// While there are still units to remove
-	while(units > 0)
+	// and we haven't reached the end of the tree
+	// and we haven't hit the removal limit
+	while(units > 0 and current and current->price() >= limit)
 	{
 		// if the volume of the current limit is less than the number of units to delete
 		// remove the whole limit from the tree
@@ -127,11 +128,7 @@ void OrderBook::removeUnits(int units, bool isBuy)
 			}
 		}
 	}
-}
-
-void OrderBook::removeUnitsWithLimit(int units, bool isBuy, int limit)
-{
-
+	return units;
 }
 
 int main(){
