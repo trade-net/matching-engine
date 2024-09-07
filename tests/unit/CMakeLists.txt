@@ -1,5 +1,5 @@
 add_executable(sxchange.t
-	remove_units.t.cpp
+	order_book.t.cpp
 )
 
 target_link_libraries(sxchange.t PRIVATE

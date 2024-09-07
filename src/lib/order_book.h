@@ -10,7 +10,18 @@ class OrderBook{
 public:
 	OrderBook();
 	bool addOrder(Order& order);
-	int removeUnits(int units, bool isBuy, int limit);
+	int removeUnits(int units, bool isBuy, int limit=0);
+
+	// for testing
+	bool isLimitInMap(Limit* limit){
+		auto it = limitMap.find(limit->price());
+		return it != limitMap.end();
+	}
+
+	bool isOrderInMap(Order* order){
+		auto it = orderMap.find(order->id);
+		return it != orderMap.end();
+	}
 
 private:
 	Limit* buyTree;

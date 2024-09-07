@@ -54,7 +54,7 @@ bool OrderBook::addOrder(Order& order)
 
 
 // isBuy tells us whether we're removing from the buyTree or sellTree
-int OrderBook::removeUnits(int units, bool isBuy, int limit=0)
+int OrderBook::removeUnits(int units, bool isBuy, int limit)
 {
 	Limit* current;
 	if(isBuy)
