@@ -112,7 +112,8 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 				// can just delete the order and update the doubly linked list
 				if(units >= currentOrder->units)
 				{
-					// decrement the units remaining
+					// decrement the units remaining by the number of shares in current order
+					// update current limit's volume accordingly
 					units -= currentOrder->units;	
 					current->decrementVolume(currentOrder->units);
 					orderMap.erase(currentOrder->id);
@@ -123,6 +124,7 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 					current->setHeadOrder(currentOrder);
 				}
 				// if not, subtract the remaining units from the current order
+				// update current limit's volume accordingly
 				else
 				{
 					currentOrder->units -= units;

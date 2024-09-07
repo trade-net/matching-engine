@@ -81,9 +81,13 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 				s_leftChild->s_parent = s_parent;
 				return s_leftChild;
 			}
+			// if the current limit is the root node of the tree
 			else
 			{
+				// make the left child the new root node
 				s_leftChild->s_parent = nullptr;
+				// traverse through the right childs of the root node
+				// to find the next largest limit
 				std::shared_ptr<Limit> nextLimit = s_leftChild;
 				while(nextLimit->s_rightChild)
 				{
