@@ -126,7 +126,7 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 				else
 				{
 					currentOrder->units -= units;
-					current->decrementVolume(currentOrder->units);
+					current->decrementVolume(units);
 					units = 0;
 				}
 			}
