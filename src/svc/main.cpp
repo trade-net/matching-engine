@@ -4,6 +4,8 @@
 int main(){
 	OrderBook aapl;
 	Order a(1, true, 3, 100, 1);
+	aapl.addOrder(a);
+	/*
 	Order b(2, true, 5, 100, 2);
 	Order c(3, true, 5, 100, 3);
 	Order d(4, true, 8, 95, 4);
@@ -22,4 +24,5 @@ int main(){
 	aapl.addOrder(g);
 	aapl.addOrder(h);
 	aapl.addOrder(i);
+	*/
 }

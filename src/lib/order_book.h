@@ -13,21 +13,21 @@ public:
 	int removeUnits(int units, bool isBuy, int limit=0);
 
 	// for testing
-	bool isLimitInMap(Limit* limit){
-		auto it = limitMap.find(limit->price());
+	bool isLimitInMap(int limit){
+		auto it = limitMap.find(limit);
 		return it != limitMap.end();
 	}
 
-	bool isOrderInMap(Order* order){
-		auto it = orderMap.find(order->id);
+	bool isOrderInMap(int id){
+		auto it = orderMap.find(id);
 		return it != orderMap.end();
 	}
 
 private:
-	Limit* buyTree;
-	Limit* sellTree;
-	Limit* lowestSell;
-	Limit* highestBuy;
+	Limit* buyTree = nullptr;
+	Limit* sellTree = nullptr;
+	Limit* lowestSell = nullptr;
+	Limit* highestBuy = nullptr;
 	std::unordered_map<int, Limit*> limitMap;
 	std::unordered_map<int, Order*> orderMap;
 	bool isBuyTreeInitialised = false;

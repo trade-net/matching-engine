@@ -1,24 +1,25 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <order_book.h>
+#include <order.h>
 
 namespace{
 
 class OrderBookTest: public testing::Test{
-	protected:
-		OrderBookTest(){
-			book.addOrder(a);
-			book.addOrder(b);
-			book.addOrder(c);
-			book.addOrder(d);
-			book.addOrder(e);
-			book.addOrder(f);
-			book.addOrder(g);
-			book.addOrder(h);
-			book.addOrder(i);
-			book.addOrder(j);
-		}
-
+public:
+	OrderBookTest()
+	{
+		book.addOrder(a);
+		book.addOrder(b);
+		book.addOrder(c);
+		book.addOrder(d);
+		book.addOrder(e);
+		book.addOrder(f);
+		book.addOrder(g);
+		book.addOrder(h);
+		book.addOrder(i);
+		book.addOrder(j);
+	}
 	
 	OrderBook book;
 	Order a{1, true, 3, 100, 1};
@@ -34,6 +35,9 @@ class OrderBookTest: public testing::Test{
 };
 
 TEST_F(OrderBookTest, testRemoveUnits){
+	int remaining = book.removeUnits(8, true);
+
+	ASSERT_EQ(remaining, 0);
 }
 
 }

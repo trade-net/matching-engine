@@ -6,19 +6,22 @@ OrderBook::OrderBook(){}
 
 void OrderBook::addFirstOrderAtLimit(Order& order)
 {
+	std::cout << "a" << std::endl;
 	Limit* limit;
 	if(order.isBuy)
 	{
 		limit = Limit::createFirstLimitAtPrice(order, buyTree);
-		if(limit->price() > highestBuy->price())
+		std::cout << "b" << std::endl;
+		if(!highestBuy or limit->price() > highestBuy->price())
 		{
 			highestBuy = limit;
+			std::cout << "c" << std::endl;
 		}
 	}
 	else
 	{
 		limit = Limit::createFirstLimitAtPrice(order, sellTree);
-		if(limit->price() < lowestSell->price())
+		if(!lowestSell or limit->price() < lowestSell->price())
 		{
 			lowestSell = limit;
 		}

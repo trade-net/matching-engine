@@ -1,4 +1,5 @@
 #include <limit.h>
+#include <iostream>
 
 Limit::Limit(Order& order, Limit* parent)
 : s_price(order.limit)
@@ -34,9 +35,11 @@ Order* Limit::addOrderToLimit(Order& order)
 
 Limit* Limit::createFirstLimitAtPrice(Order& order, Limit*& root)
 {
+	std::cout << 1 << std::endl;
 	if(root == nullptr)
 	{
 		root = new Limit(order);
+		std::cout << 2 << std::endl;
 		return root;
 	}
 
