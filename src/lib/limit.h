@@ -2,18 +2,19 @@
 #define INCLUDED_LIMIT
 
 #include <order.h>
+#include <memory>
 
 class Limit{
 public:
-	Limit(Order& order, Limit* parent);
+	Limit(std::shared_ptr<Order> order, std::shared_ptr<Limit> parent);
 
-	Limit(Order& order);
+	Limit(std::shared_ptr<Order> order);
 
-	Order* addOrderToLimit(Order& order);
+	std::shared_ptr<Order> addOrderToLimit(std::shared_ptr<Order> order);
 
-	static Limit* createFirstLimitAtPrice(Order& order, Limit*& root);
+	static std::shared_ptr<Limit> createFirstLimitAtPrice(std::shared_ptr<Order> order, std::shared_ptr<Limit>& root);
 
-	Limit* removeLimit(bool isBuy);
+	std::shared_ptr<Limit> removeLimit(bool isBuy);
 
 	int price() const{
 		return s_price;
@@ -27,11 +28,20 @@ public:
 		return s_volume;
 	}
 
-	Order* headOrder() const{
+	void decrementVolume(int amount)
+	{
+		s_volume -= amount;
+	}
+
+	std::shared_ptr<Order> headOrder() const{
 		return s_headOrder;
 	}
 
-	void setHeadOrder(Order* order)
+	std::shared_ptr<Order> tailOrder() const{
+		return s_tailOrder;
+	}
+
+	void setHeadOrder(std::shared_ptr<Order> order)
 	{
 		s_headOrder = order;
 	}
@@ -40,12 +50,11 @@ private:
 	int s_price;
 	int s_size; // number of Orders
 	int s_volume; // number of units
-	Limit* s_parent;
-	Limit* s_leftChild;
-	Limit* s_rightChild;
-	Order* s_headOrder;
-	Order* s_tailOrder;
-
+	std::shared_ptr<Limit> s_parent;
+	std::shared_ptr<Limit> s_leftChild;
+	std::shared_ptr<Limit> s_rightChild;
+	std::shared_ptr<Order> s_headOrder;
+	std::shared_ptr<Order> s_tailOrder;
 };
 
 #endif

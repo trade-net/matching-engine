@@ -4,18 +4,15 @@
 
 OrderBook::OrderBook(){}
 
-void OrderBook::addFirstOrderAtLimit(Order& order)
+void OrderBook::addFirstOrderAtLimit(std::shared_ptr<Order> order)
 {
-	std::cout << "a" << std::endl;
-	Limit* limit;
-	if(order.isBuy)
+	std::shared_ptr<Limit> limit;
+	if(order->isBuy)
 	{
 		limit = Limit::createFirstLimitAtPrice(order, buyTree);
-		std::cout << "b" << std::endl;
 		if(!highestBuy or limit->price() > highestBuy->price())
 		{
 			highestBuy = limit;
-			std::cout << "c" << std::endl;
 		}
 	}
 	else
@@ -27,21 +24,21 @@ void OrderBook::addFirstOrderAtLimit(Order& order)
 		}
 	}
 
-	order.parentLimit = limit;
+	order->parentLimit = limit;
 
-	limitMap.insert(std::pair<int, Limit*>(order.limit, limit));
+	limitMap.insert(std::pair<int, std::shared_ptr<Limit>>(order->limit, limit));
 	
-	std::cout << "Added first order at limit $" << order.limit << std::endl;
+	std::cout << "Added first order at limit $" << order->limit << std::endl;
 }
 
 
-bool OrderBook::addOrder(Order& order)
+bool OrderBook::addOrder(std::shared_ptr<Order> order)
 {
-	if(auto it = limitMap.find(order.limit); it != limitMap.end())
+	if(auto it = limitMap.find(order->limit); it != limitMap.end())
 	{
-		Limit* limitPtr = it->second;
-		order.prevOrder = limitPtr->addOrderToLimit(order);
-		std::cout << "Added order to limit $" << order.limit << " size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
+		std::shared_ptr<Limit> limitPtr = it->second;
+		order->prevOrder = limitPtr->addOrderToLimit(order);
+		std::cout << "Added order to limit $" << order->limit << " size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
 
 	}
 	else
@@ -50,7 +47,7 @@ bool OrderBook::addOrder(Order& order)
 	}
 
 
-	orderMap.insert(std::pair<int, Order*>(order.id, &order));
+	orderMap.insert(std::pair<int, std::shared_ptr<Order>>(order->id, order));
 
 	return true;
 }
@@ -59,7 +56,7 @@ bool OrderBook::addOrder(Order& order)
 // isBuy tells us whether we're removing from the buyTree or sellTree
 int OrderBook::removeUnits(int units, bool isBuy, int limit)
 {
-	Limit* current;
+	std::shared_ptr<Limit> current;
 	if(isBuy)
 	{
 		current = highestBuy;
@@ -76,35 +73,39 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 	{
 		// if the volume of the current limit is less than the number of units to delete
 		// remove the whole limit from the tree
+		std::cout << "A" << std::endl;
+		std::cout << current->volume()  << std::endl;
+		std::cout << current->price()  << std::endl;
 		if(units >= current->volume())
 		{
 			// iterate through the orders in the limit and delete them from the map
 			// clean up their memory
-			Order* currentOrder = current->headOrder();
-			Order* orderToDelete = nullptr;
+			std::shared_ptr<Order> currentOrder = current->headOrder();
 			while(currentOrder)
 			{
-				orderToDelete = currentOrder;
 				orderMap.erase(currentOrder->id);
 				currentOrder = currentOrder->nextOrder;
-				delete orderToDelete;
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			Limit* limitToDelete = current;
+			units -= current->volume();
+			limitMap.erase(current->price());
 			current = current->removeLimit(isBuy);
-
-			units -= limitToDelete->volume();
-			limitMap.erase(limitToDelete->price());
-			delete limitToDelete;
+			if(isBuy)
+			{
+				highestBuy = current;
+			}
+			else
+			{
+				lowestSell = current;
+			}
 		}
 
 		// if not, remove the remaining units from the current limit
 		else
 		{
 			// starting from the head order
-			Order* currentOrder = current->headOrder();
-			Order* orderToDelete = nullptr;
+			std::shared_ptr<Order> currentOrder = current->headOrder();
 			while(units)
 			{
 				// if more units to delete than that of the current order
@@ -113,19 +114,19 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 				{
 					// decrement the units remaining
 					units -= currentOrder->units;	
-					orderToDelete = currentOrder;
+					current->decrementVolume(currentOrder->units);
 					orderMap.erase(currentOrder->id);
 
 					// update headOrder and nextOrder's prevOrder
 					currentOrder->nextOrder->prevOrder = nullptr;
 					currentOrder = currentOrder->nextOrder;
 					current->setHeadOrder(currentOrder);
-					delete orderToDelete;
 				}
 				// if not, subtract the remaining units from the current order
 				else
 				{
 					currentOrder->units -= units;
+					current->decrementVolume(currentOrder->units);
 					units = 0;
 				}
 			}
@@ -133,5 +134,4 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 	}
 	return units;
 }
-
 

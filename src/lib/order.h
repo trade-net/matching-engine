@@ -1,6 +1,8 @@
 #ifndef INCLUDED_ORDER
 #define INCLUDED_ORDER
 
+#include <memory>
+
 class Limit; //forward declaration
 
 class Order{
@@ -18,9 +20,9 @@ public:
 	int units;
 	int limit;
 	int timestamp;
-	Order* nextOrder = nullptr;
-	Order* prevOrder = nullptr;
-	Limit* parentLimit = nullptr;
+	std::shared_ptr<Order> nextOrder = nullptr;
+	std::shared_ptr<Order> prevOrder = nullptr;
+	std::shared_ptr<Limit> parentLimit = nullptr;
 };
 
 #endif
