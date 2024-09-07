@@ -97,8 +97,12 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			}
 		}
 
-		s_parent->s_rightChild = nullptr;
-		return s_parent;
+		if(s_parent)
+		{
+			s_parent->s_rightChild = nullptr;
+			return s_parent;
+		}
+		return nullptr;
 	}
 	else
 	{
@@ -122,7 +126,11 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			}
 		}
 
-		s_parent->s_leftChild = nullptr;
-		return s_parent;
+		if(s_parent)
+		{
+			s_parent->s_leftChild = nullptr;
+			return s_parent;
+		}
+		return nullptr;
 	}
 }

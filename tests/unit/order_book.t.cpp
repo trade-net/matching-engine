@@ -21,6 +21,7 @@ public:
 		book.addOrder(h);
 		book.addOrder(i);
 		book.addOrder(j);
+		book.addOrder(k);
 	}
 	
 	OrderBook book;
@@ -34,6 +35,7 @@ public:
 	std::shared_ptr<Order> h = std::make_shared<Order>(8, true, 6, 102, 8);
 	std::shared_ptr<Order> i = std::make_shared<Order>(9, true, 12, 102, 9);
 	std::shared_ptr<Order> j = std::make_shared<Order>(10, true, 10, 98, 10);
+	std::shared_ptr<Order> k = std::make_shared<Order>(11, true, 13, 96, 11);
 };
 
 TEST_F(OrderBookTest, testRemoveUnits){
@@ -64,6 +66,20 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	ASSERT_EQ(book.getHighestBuy(), 97);
 	ASSERT_FALSE(book.isOrderInMap(10));
 	ASSERT_FALSE(book.isLimitInMap(98));
+
+	remaining = book.removeUnits(20, true, 96);
+	ASSERT_EQ(remaining, 4);
+	ASSERT_EQ(book.getHighestBuy(), 95);
+	ASSERT_FALSE(book.isOrderInMap(6));
+	ASSERT_FALSE(book.isOrderInMap(11));
+	ASSERT_FALSE(book.isLimitInMap(97));
+	ASSERT_FALSE(book.isLimitInMap(96));
+
+	remaining = book.removeUnits(40, true);
+	ASSERT_EQ(remaining, 9);
+	ASSERT_FALSE(book.isOrderInMap(4));
+	ASSERT_FALSE(book.isOrderInMap(5));
+	ASSERT_FALSE(book.isLimitInMap(95));
 }
 
 }
