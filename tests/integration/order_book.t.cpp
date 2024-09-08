@@ -82,4 +82,55 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	ASSERT_FALSE(book.isLimitInMap(95));
 }
 
+TEST_F(OrderBookTest, testRemoveAndAddUnits)
+{
+	int remaining = book.removeUnits(7, true);
+	ASSERT_EQ(remaining, 0);
+	ASSERT_FALSE(book.isOrderInMap(7));
+	ASSERT_FALSE(book.isLimitInMap(105));
+	ASSERT_EQ(book.getHighestBuy(), 102);
+
+	remaining = book.removeUnits(5, true, 102);
+	ASSERT_EQ(remaining, 0);
+	ASSERT_EQ(book.getHighestBuy(), 102);
+	ASSERT_TRUE(book.isOrderInMap(8));
+	ASSERT_TRUE(book.isOrderInMap(9));
+	ASSERT_TRUE(book.isLimitInMap(102));
+
+	remaining = book.removeUnits(1, true);
+	ASSERT_EQ(remaining, 0);
+	ASSERT_EQ(book.getHighestBuy(), 102);
+	ASSERT_FALSE(book.isOrderInMap(8));
+	ASSERT_TRUE(book.isOrderInMap(9));
+	ASSERT_TRUE(book.isLimitInMap(102));
+
+	std::shared_ptr<Order> order104 = std::make_shared<Order>(12, true, 8, 104, 12);
+	book.addOrder(order104);
+	ASSERT_EQ(book.getHighestBuy(), 104);
+	ASSERT_TRUE(book.isLimitInMap(104));
+	ASSERT_TRUE(book.isOrderInMap(12));
+
+	remaining = book.removeUnits(20, true, 103);
+	ASSERT_EQ(remaining, 12);
+	ASSERT_EQ(book.getHighestBuy(), 102);
+	ASSERT_FALSE(book.isOrderInMap(12));
+	ASSERT_FALSE(book.isLimitInMap(104));
+	ASSERT_TRUE(book.isOrderInMap(9));
+	ASSERT_TRUE(book.isLimitInMap(102));
+
+	book.addOrder(order104);
+	ASSERT_EQ(book.getHighestBuy(), 104);
+	ASSERT_TRUE(book.isLimitInMap(104));
+	ASSERT_TRUE(book.isOrderInMap(12));
+
+	remaining = book.removeUnits(20, true, 100);
+	ASSERT_EQ(remaining, 0);
+	ASSERT_EQ(book.getHighestBuy(), 100);
+	ASSERT_FALSE(book.isOrderInMap(12));
+	ASSERT_FALSE(book.isLimitInMap(104));
+	ASSERT_FALSE(book.isOrderInMap(9));
+	ASSERT_FALSE(book.isLimitInMap(102));
+	
+}
+
 }
