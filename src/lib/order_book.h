@@ -10,7 +10,7 @@
 class OrderBook{
 public:
 	OrderBook();
-	bool addOrder(std::shared_ptr<Order> order);
+	void addOrder(std::shared_ptr<Order> order);
 	int removeUnits(int units, bool isBuy, int limit=0);
 
 	// for testing

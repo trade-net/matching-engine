@@ -32,7 +32,7 @@ void OrderBook::addFirstOrderAtLimit(std::shared_ptr<Order> order)
 }
 
 
-bool OrderBook::addOrder(std::shared_ptr<Order> order)
+void OrderBook::addOrder(std::shared_ptr<Order> order)
 {
 	if(auto it = limitMap.find(order->limit); it != limitMap.end())
 	{
@@ -48,8 +48,6 @@ bool OrderBook::addOrder(std::shared_ptr<Order> order)
 
 
 	orderMap.insert(std::pair<int, std::shared_ptr<Order>>(order->id, order));
-
-	return true;
 }
 
 
