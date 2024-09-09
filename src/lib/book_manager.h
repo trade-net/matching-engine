@@ -14,9 +14,11 @@ enum OrderStatus{
 class BookManager{
 public:
 	BookManager();
-	OrderStatus processOrder(const ExchangeOrder& order);
+	OrderStatus processOrderRequest(const ExchangeOrder& order);
 
 private:
+	OrderBook orderBook;
 };
 
 #endif
+
