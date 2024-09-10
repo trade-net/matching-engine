@@ -1,9 +1,12 @@
 #ifndef INCLUDED_ORDER
 #define INCLUDED_ORDER
 
-struct Limit; //forward declaration
+#include <memory>
 
-struct Order{
+class Limit; //forward declaration
+
+class Order{
+public:
 	Order(int id, bool isBuy, int units, int limit, int timestamp)
 	: id(id)
 	, isBuy(isBuy)
@@ -17,9 +20,9 @@ struct Order{
 	int units;
 	int limit;
 	int timestamp;
-	Order* nextOrder = nullptr;
-	Order* prevOrder = nullptr;
-	Limit* parentLimit = nullptr;
+	std::shared_ptr<Order> nextOrder = nullptr;
+	std::shared_ptr<Order> prevOrder = nullptr;
+	std::shared_ptr<Limit> parentLimit = nullptr;
 };
 
 #endif
