@@ -5,7 +5,7 @@ BookManager::BookManager()
 : orderBook()
 {}
 
-OrderStatus BookManager::processOrderRequest(const OrderRequest& orderRequest)
+OrderStatus BookManager::matchOrderRequest(const OrderRequest& orderRequest)
 {
 	std::shared_ptr<Order> order = orderRequest.toOrder();
 	int orderLimit = 0;
@@ -14,7 +14,8 @@ OrderStatus BookManager::processOrderRequest(const OrderRequest& orderRequest)
 		orderLimit = order->limit;
 	}
 
-	int remaining = orderBook.removeUnits(order->units, order->isBuy, orderLimit);
+	// remove shares from the sell tree if order isBuy, and buy tree of order isSell
+	int remaining = orderBook.removeUnits(order->units, !order->isBuy, orderLimit);
 
 	if(remaining)
 	{
@@ -22,8 +23,12 @@ OrderStatus BookManager::processOrderRequest(const OrderRequest& orderRequest)
 		{
 			order->units = remaining;
 			orderBook.addOrder(order);
+			return (remaining == order->units) ? OrderStatus::UNFILLED : OrderStatus::PARTIALLY_FILLED;
 		}
-		return OrderStatus::PARTIALLY_FILLED;
+		else
+		{
+			return (remaining == order->units) ? OrderStatus::FAILED : OrderStatus::PARTIALLY_FILLED;
+		}
 	}
 
 	return OrderStatus::FILLED;

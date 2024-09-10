@@ -9,12 +9,13 @@ enum OrderStatus{
 	FILLED;
 	PARTIALLY_FILLED;
 	UNFILLED;
+	FAILED;
 };
 
 class BookManager{
 public:
 	BookManager();
-	OrderStatus processOrderRequest(const ExchangeOrder& order);
+	OrderStatus matchOrderRequest(const ExchangeOrder& order);
 
 private:
 	OrderBook orderBook;
