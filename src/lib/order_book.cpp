@@ -64,17 +64,16 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 		current = lowestSell;
 	}
 
+	int unitsToDelete = units;
+
 	// While there are still units to remove
 	// and we haven't reached the end of the tree
 	// and we haven't hit the removal limit
-	while(units > 0 and current and current->price() >= limit)
+	while(unitsToDelete > 0 and current and (isBuy ? current->price() >= limit : current->price() <= limit))
 	{
 		// if the volume of the current limit is less than the number of units to delete
 		// remove the whole limit from the tree
-		std::cout << "A" << std::endl;
-		std::cout << current->volume()  << std::endl;
-		std::cout << current->price()  << std::endl;
-		if(units >= current->volume())
+		if(unitsToDelete >= current->volume())
 		{
 			// iterate through the orders in the limit and delete them from the map
 			// clean up their memory
@@ -86,7 +85,7 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			units -= current->volume();
+			unitsToDelete -= current->volume();
 			limitMap.erase(current->price());
 			current = current->removeLimit(isBuy);
 			if(isBuy)
@@ -104,15 +103,15 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 		{
 			// starting from the head order
 			std::shared_ptr<Order> currentOrder = current->headOrder();
-			while(units)
+			while(unitsToDelete)
 			{
 				// if more units to delete than that of the current order
 				// can just delete the order and update the doubly linked list
-				if(units >= currentOrder->units)
+				if(unitsToDelete >= currentOrder->units)
 				{
 					// decrement the units remaining by the number of shares in current order
 					// update current limit's volume accordingly
-					units -= currentOrder->units;	
+					unitsToDelete -= currentOrder->units;
 					current->decrementVolume(currentOrder->units);
 					orderMap.erase(currentOrder->id);
 
@@ -125,13 +124,13 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 				// update current limit's volume accordingly
 				else
 				{
-					currentOrder->units -= units;
-					current->decrementVolume(units);
-					units = 0;
+					currentOrder->units -= unitsToDelete;
+					current->decrementVolume(unitsToDelete);
+					unitsToDelete = 0;
 				}
 			}
 		}
 	}
-	return units;
+	return unitsToDelete;
 }
 
