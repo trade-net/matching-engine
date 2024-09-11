@@ -7,11 +7,29 @@
 #include <unordered_map>
 #include <memory>
 
+struct OrderStatus{
+	OrderStatus(int units)
+	: totalUnits(units)
+	, unitsUnfilled(units)
+	, unitsInBook(0)
+	, unitsFilled(0)
+	, priceFilled(0)
+	{}
+
+	int totalUnits;
+	int unitsUnfilled;
+	int unitsInBook;
+	int unitsFilled;
+	int priceFilled;
+};
+
 class OrderBook{
 public:
 	OrderBook();
+	//OrderStatus processOrder(OrderRequest& orderRequest);
 	void addOrder(std::shared_ptr<Order> order);
-	int removeUnits(int units, bool fromBuyTree, int limit=0);
+	void matchOrder(std::shared_ptr<Order> order, OrderStatus& orderStatus);
+	void removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled);
 
 	// for testing
 	bool isLimitInMap(int limit){

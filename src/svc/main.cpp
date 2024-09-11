@@ -4,6 +4,7 @@
 #include <iostream>
 
 int main(){
+	/*
 	OrderBook aapl;
 	std::shared_ptr<Order> a = std::make_shared<Order>(1, true, 3, 100, 1);
 	std::shared_ptr<Order> b = std::make_shared<Order>(2, true, 5, 100, 2);
@@ -40,4 +41,5 @@ int main(){
 	std::cout << aapl.getHighestBuy() << std::endl;
 
 	remaining = aapl.removeUnits(8, true);
+	*/
 }
