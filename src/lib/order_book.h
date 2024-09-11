@@ -11,7 +11,7 @@ class OrderBook{
 public:
 	OrderBook();
 	void addOrder(std::shared_ptr<Order> order);
-	int removeUnits(int units, bool isBuy, int limit=0);
+	int removeUnits(int units, bool fromBuyTree, int limit=0);
 
 	// for testing
 	bool isLimitInMap(int limit){
