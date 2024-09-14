@@ -50,6 +50,10 @@ public:
 		return lowestSell->price();
 	}
 
+	int getBuyTreeRoot() const{
+		return buyTree->price();
+	}
+
 private:
 	std::shared_ptr<Limit> buyTree = nullptr;
 	std::shared_ptr<Limit> sellTree = nullptr;

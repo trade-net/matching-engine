@@ -69,7 +69,7 @@ std::shared_ptr<Limit> Limit::createFirstLimitAtPrice(std::shared_ptr<Order> ord
 
 }
 
-std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
+std::shared_ptr<Limit> Limit::removeLimit(bool isBuy, std::shared_ptr<Limit>& root)
 {
 	if(isBuy)
 	{
@@ -86,6 +86,7 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			{
 				// make the left child the new root node
 				s_leftChild->s_parent = nullptr;
+				root = s_leftChild;
 				// traverse through the right childs of the root node
 				// to find the next largest limit
 				std::shared_ptr<Limit> nextLimit = s_leftChild;
@@ -102,6 +103,7 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			s_parent->s_rightChild = nullptr;
 			return s_parent;
 		}
+		root = nullptr;
 		return nullptr;
 	}
 	else
@@ -117,6 +119,7 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			else
 			{
 				s_rightChild->s_parent = nullptr;
+				root = s_rightChild;
 				std::shared_ptr<Limit> nextLimit = s_rightChild;
 				while(nextLimit->s_leftChild)
 				{
@@ -131,6 +134,7 @@ std::shared_ptr<Limit> Limit::removeLimit(bool isBuy)
 			s_parent->s_leftChild = nullptr;
 			return s_parent;
 		}
+		root = nullptr;
 		return nullptr;
 	}
 }

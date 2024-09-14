@@ -5,6 +5,8 @@
 #include <order.h>
 #include <limit.h>
 
+#include <memory>
+
 enum OrderStatus{
 	FILLED;
 	PARTIALLY_FILLED;
@@ -15,10 +17,9 @@ enum OrderStatus{
 class BookManager{
 public:
 	BookManager();
-	OrderStatus matchOrderRequest(const ExchangeOrder& order);
 
 private:
-	OrderBook orderBook;
+	std::unordered_map<OrderBook> orderBooks;
 };
 
 #endif

@@ -95,13 +95,14 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 
 			priceFilled += current->volume() * current->price();
 
-			current = current->removeLimit(fromBuyTree);
 			if(fromBuyTree)
 			{
+				current = current->removeLimit(fromBuyTree, buyTree);
 				highestBuy = current;
 			}
 			else
 			{
+				current = current->removeLimit(fromBuyTree, sellTree);
 				lowestSell = current;
 			}
 		}
