@@ -26,7 +26,7 @@ struct OrderStatus{
 class OrderBook{
 public:
 	OrderBook();
-	//OrderStatus processOrder(OrderRequest& orderRequest);
+	OrderStatus processOrder(std::shared_ptr<Order> order);
 	void addOrder(std::shared_ptr<Order> order);
 	void matchOrder(std::shared_ptr<Order> order, OrderStatus& orderStatus);
 	void removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled);

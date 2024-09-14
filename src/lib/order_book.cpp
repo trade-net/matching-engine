@@ -147,10 +147,8 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 	unitsFilled = units - unitsRemaining;
 }
 
-/*
-OrderStatus OrderBook::processOrder(OrderRequest& orderRequest)
+OrderStatus OrderBook::processOrder(std::shared_ptr<Order> order)
 {
-	std::make_shared<Order> order = orderRequest.toOrder();
 	OrderStatus orderStatus(order->units);
 
 	matchOrder(order, orderStatus);
@@ -163,4 +161,3 @@ OrderStatus OrderBook::processOrder(OrderRequest& orderRequest)
 
 	return orderStatus;
 }
-*/
