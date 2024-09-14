@@ -62,6 +62,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_EQ(unitsFilled, 15);
 	EXPECT_EQ(priceFilled, 100*13 + 98*2);
 	EXPECT_EQ(book.getHighestBuy(), 98);
+	EXPECT_EQ(book.getBuyTreeRoot(), 95);
 	EXPECT_FALSE(book.isOrderInMap(1));
 	EXPECT_FALSE(book.isOrderInMap(2));
 	EXPECT_FALSE(book.isOrderInMap(3));
