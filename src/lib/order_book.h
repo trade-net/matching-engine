@@ -16,6 +16,8 @@ struct OrderStatus{
 	, priceFilled(0)
 	{}
 
+	OrderStatus();
+
 	int totalUnits;
 	int unitsUnfilled;
 	int unitsInBook;
@@ -30,6 +32,10 @@ public:
 	void addOrder(std::shared_ptr<Order> order);
 	void matchOrder(std::shared_ptr<Order> order, OrderStatus& orderStatus);
 	void removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled);
+
+	bool isActive(){
+		return buyTree and sellTree;
+	}
 
 	// for testing
 	bool isLimitInMap(int limit){

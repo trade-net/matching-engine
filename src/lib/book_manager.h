@@ -2,24 +2,19 @@
 #define INCLUDED_BOOK_MANAGER
 
 #include <order_book.h>
+#include <order_request.h>
 #include <order.h>
 #include <limit.h>
 
 #include <memory>
 
-enum OrderStatus{
-	FILLED;
-	PARTIALLY_FILLED;
-	UNFILLED;
-	FAILED;
-};
-
 class BookManager{
 public:
 	BookManager();
+	void processOrderRequest(OrderRequest& order);
 
 private:
-	std::unordered_map<OrderBook> orderBooks;
+	std::unordered_map<std::string, OrderBook> orderBooks;
 };
 
 #endif

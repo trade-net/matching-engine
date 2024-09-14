@@ -1,4 +1,5 @@
 add_library(sxchangelib
+	book_manager.cpp
 	order_book.cpp
 	limit.cpp
 	order.cpp
