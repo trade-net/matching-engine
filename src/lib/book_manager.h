@@ -3,6 +3,7 @@
 
 #include <order_book.h>
 #include <order_request.h>
+#include <threadpool.h>
 #include <order.h>
 #include <limit.h>
 
@@ -10,11 +11,15 @@
 
 class BookManager{
 public:
-	BookManager();
+	BookManager(size_t poolSize);
 	void processOrderRequest(OrderRequest& order);
 
 private:
 	std::unordered_map<std::string, OrderBook> orderBooks;
+	ThreadPool threadPool;
+	size_t threadPoolSize;
+
+	std::mutex orderBooksMutex;
 };
 
 #endif
