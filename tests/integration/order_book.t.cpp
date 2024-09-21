@@ -39,98 +39,139 @@ public:
 };
 
 TEST_F(OrderBookTest, testRemoveUnits){
-	int remaining = book.removeUnits(7, true);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_FALSE(book.isOrderInMap(7));
-	ASSERT_FALSE(book.isLimitInMap(105));
-	ASSERT_EQ(book.getHighestBuy(), 102);
+	int remaining, unitsFilled, priceFilled;
+	book.removeUnits(7, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 7);
+	EXPECT_EQ(priceFilled, 7*105);
+	EXPECT_FALSE(book.isOrderInMap(7));
+	EXPECT_FALSE(book.isLimitInMap(105));
+	EXPECT_EQ(book.getHighestBuy(), 102);
 
-	remaining = book.removeUnits(20, true, 102);
-	ASSERT_EQ(remaining, 2);
-	ASSERT_EQ(book.getHighestBuy(), 100);
-	ASSERT_FALSE(book.isOrderInMap(8));
-	ASSERT_FALSE(book.isOrderInMap(9));
-	ASSERT_FALSE(book.isLimitInMap(102));
+	book.removeUnits(20, true, 102, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 2);
+	EXPECT_EQ(unitsFilled, 18);
+	EXPECT_EQ(priceFilled, 18*102);
+	EXPECT_EQ(book.getHighestBuy(), 100);
+	EXPECT_FALSE(book.isOrderInMap(8));
+	EXPECT_FALSE(book.isOrderInMap(9));
+	EXPECT_FALSE(book.isLimitInMap(102));
 
-	remaining = book.removeUnits(15, true);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_EQ(book.getHighestBuy(), 98);
-	ASSERT_FALSE(book.isOrderInMap(1));
-	ASSERT_FALSE(book.isOrderInMap(2));
-	ASSERT_FALSE(book.isOrderInMap(3));
-	ASSERT_FALSE(book.isLimitInMap(100));
-	ASSERT_TRUE(book.isLimitInMap(98));
+	book.removeUnits(15, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 15);
+	EXPECT_EQ(priceFilled, 100*13 + 98*2);
+	EXPECT_EQ(book.getHighestBuy(), 98);
+	EXPECT_EQ(book.getBuyTreeRoot(), 95);
+	EXPECT_FALSE(book.isOrderInMap(1));
+	EXPECT_FALSE(book.isOrderInMap(2));
+	EXPECT_FALSE(book.isOrderInMap(3));
+	EXPECT_FALSE(book.isLimitInMap(100));
+	EXPECT_TRUE(book.isLimitInMap(98));
 
-	remaining = book.removeUnits(8, true);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_EQ(book.getHighestBuy(), 97);
-	ASSERT_FALSE(book.isOrderInMap(10));
-	ASSERT_FALSE(book.isLimitInMap(98));
+	book.removeUnits(8, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 8);
+	EXPECT_EQ(priceFilled, 98*8);
+	EXPECT_EQ(book.getHighestBuy(), 97);
+	EXPECT_FALSE(book.isOrderInMap(10));
+	EXPECT_FALSE(book.isLimitInMap(98));
 
-	remaining = book.removeUnits(20, true, 96);
-	ASSERT_EQ(remaining, 4);
-	ASSERT_EQ(book.getHighestBuy(), 95);
-	ASSERT_FALSE(book.isOrderInMap(6));
-	ASSERT_FALSE(book.isOrderInMap(11));
-	ASSERT_FALSE(book.isLimitInMap(97));
-	ASSERT_FALSE(book.isLimitInMap(96));
+	book.removeUnits(20, true, 96, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 4);
+	EXPECT_EQ(unitsFilled, 16);
+	EXPECT_EQ(priceFilled, 97*3 + 96*13);
+	EXPECT_EQ(book.getHighestBuy(), 95);
+	EXPECT_FALSE(book.isOrderInMap(6));
+	EXPECT_FALSE(book.isOrderInMap(11));
+	EXPECT_FALSE(book.isLimitInMap(97));
+	EXPECT_FALSE(book.isLimitInMap(96));
 
-	remaining = book.removeUnits(40, true);
-	ASSERT_EQ(remaining, 9);
-	ASSERT_FALSE(book.isOrderInMap(4));
-	ASSERT_FALSE(book.isOrderInMap(5));
-	ASSERT_FALSE(book.isLimitInMap(95));
+	book.removeUnits(40, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 9);
+	EXPECT_EQ(unitsFilled, 31);
+	EXPECT_EQ(priceFilled, 31*95);
+	EXPECT_FALSE(book.isOrderInMap(4));
+	EXPECT_FALSE(book.isOrderInMap(5));
+	EXPECT_FALSE(book.isLimitInMap(95));
 }
 
 TEST_F(OrderBookTest, testRemoveAndAddUnits)
 {
-	int remaining = book.removeUnits(7, true);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_FALSE(book.isOrderInMap(7));
-	ASSERT_FALSE(book.isLimitInMap(105));
-	ASSERT_EQ(book.getHighestBuy(), 102);
+	int remaining, unitsFilled, priceFilled;
+	book.removeUnits(7, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 7);
+	EXPECT_EQ(priceFilled, 7*105);
+	EXPECT_FALSE(book.isOrderInMap(7));
+	EXPECT_FALSE(book.isLimitInMap(105));
+	EXPECT_EQ(book.getHighestBuy(), 102);
 
-	remaining = book.removeUnits(5, true, 102);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_EQ(book.getHighestBuy(), 102);
-	ASSERT_TRUE(book.isOrderInMap(8));
-	ASSERT_TRUE(book.isOrderInMap(9));
-	ASSERT_TRUE(book.isLimitInMap(102));
+	book.removeUnits(5, true, 102, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 5);
+	EXPECT_EQ(priceFilled, 102*5);
+	EXPECT_EQ(book.getHighestBuy(), 102);
+	EXPECT_TRUE(book.isOrderInMap(8));
+	EXPECT_TRUE(book.isOrderInMap(9));
+	EXPECT_TRUE(book.isLimitInMap(102));
 
-	remaining = book.removeUnits(1, true);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_EQ(book.getHighestBuy(), 102);
-	ASSERT_FALSE(book.isOrderInMap(8));
-	ASSERT_TRUE(book.isOrderInMap(9));
-	ASSERT_TRUE(book.isLimitInMap(102));
+	book.removeUnits(1, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 1);
+	EXPECT_EQ(priceFilled, 102);
+	EXPECT_EQ(book.getHighestBuy(), 102);
+	EXPECT_FALSE(book.isOrderInMap(8));
+	EXPECT_TRUE(book.isOrderInMap(9));
+	EXPECT_TRUE(book.isLimitInMap(102));
 
 	std::shared_ptr<Order> order104 = std::make_shared<Order>(12, true, 8, 104, 12);
 	book.addOrder(order104);
-	ASSERT_EQ(book.getHighestBuy(), 104);
-	ASSERT_TRUE(book.isLimitInMap(104));
-	ASSERT_TRUE(book.isOrderInMap(12));
+	EXPECT_EQ(book.getHighestBuy(), 104);
+	EXPECT_TRUE(book.isLimitInMap(104));
+	EXPECT_TRUE(book.isOrderInMap(12));
 
-	remaining = book.removeUnits(20, true, 103);
-	ASSERT_EQ(remaining, 12);
-	ASSERT_EQ(book.getHighestBuy(), 102);
-	ASSERT_FALSE(book.isOrderInMap(12));
-	ASSERT_FALSE(book.isLimitInMap(104));
-	ASSERT_TRUE(book.isOrderInMap(9));
-	ASSERT_TRUE(book.isLimitInMap(102));
+	book.removeUnits(20, true, 103, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 12);
+	EXPECT_EQ(unitsFilled, 8);
+	EXPECT_EQ(priceFilled, 104*8);
+	EXPECT_EQ(book.getHighestBuy(), 102);
+	EXPECT_FALSE(book.isOrderInMap(12));
+	EXPECT_FALSE(book.isLimitInMap(104));
+	EXPECT_TRUE(book.isOrderInMap(9));
+	EXPECT_TRUE(book.isLimitInMap(102));
 
 	book.addOrder(order104);
-	ASSERT_EQ(book.getHighestBuy(), 104);
-	ASSERT_TRUE(book.isLimitInMap(104));
-	ASSERT_TRUE(book.isOrderInMap(12));
+	EXPECT_EQ(book.getHighestBuy(), 104);
+	EXPECT_TRUE(book.isLimitInMap(104));
+	EXPECT_TRUE(book.isOrderInMap(12));
 
-	remaining = book.removeUnits(20, true, 100);
-	ASSERT_EQ(remaining, 0);
-	ASSERT_EQ(book.getHighestBuy(), 100);
-	ASSERT_FALSE(book.isOrderInMap(12));
-	ASSERT_FALSE(book.isLimitInMap(104));
-	ASSERT_FALSE(book.isOrderInMap(9));
-	ASSERT_FALSE(book.isLimitInMap(102));
+	book.removeUnits(20, true, 100, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 20);
+	EXPECT_EQ(priceFilled, 104*8 + 102*12);
+	EXPECT_EQ(book.getHighestBuy(), 100);
+	EXPECT_FALSE(book.isOrderInMap(12));
+	EXPECT_FALSE(book.isLimitInMap(104));
+	EXPECT_FALSE(book.isOrderInMap(9));
+	EXPECT_FALSE(book.isLimitInMap(102));
+
+	EXPECT_EQ(book.getBuyTreeRoot(), 100);
+	book.removeUnits(15, true, 0, remaining, unitsFilled, priceFilled);
+	EXPECT_EQ(remaining, 0);
+	EXPECT_EQ(unitsFilled, 15);
+	EXPECT_EQ(priceFilled, 100*13 + 98*2);
+	EXPECT_EQ(book.getHighestBuy(), 98);
+	EXPECT_FALSE(book.isOrderInMap(3));
+	EXPECT_FALSE(book.isLimitInMap(100));
+	EXPECT_EQ(book.getBuyTreeRoot(), 95);
+
+	std::shared_ptr<Order> order99 = std::make_shared<Order>(13, true, 4, 99, 13);
+	book.addOrder(order99);
+	EXPECT_EQ(book.getBuyTreeRoot(), 95);
+	EXPECT_EQ(book.getHighestBuy(), 99);
+	EXPECT_TRUE(book.isLimitInMap(99));
+	EXPECT_TRUE(book.isOrderInMap(13));
 	
 }
-
 }

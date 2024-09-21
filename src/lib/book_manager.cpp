@@ -1,31 +1,46 @@
 #include <book_manager.h>
 #include <memory>
 
-BookManager::BookManager()
-: orderBook()
-{}
-
-OrderStatus BookManager::processOrderRequest(const OrderRequest& orderRequest)
+size_t getThreadForSecurity(const std::string& security, size_t poolSize)
 {
-	std::shared_ptr<Order> order = orderRequest.toOrder();
-	int orderLimit = 0;
-	if(orderRequest.type() == OrderRequestType::LIMIT)
-	{
-		orderLimit = order->limit;
-	}
-
-	int remaining = orderBook.removeUnits(order->units, order->isBuy, orderLimit);
-
-	if(remaining)
-	{
-		if(orderLimit)
-		{
-			order->units = remaining;
-			orderBook.addOrder(order);
-		}
-		return OrderStatus::PARTIALLY_FILLED;
-	}
-
-	return OrderStatus::FILLED;
+	std::hash<std::string> hasher;
+	return hasher(security) % poolSize;
 }
 
+BookManager::BookManager(size_t poolSize)
+: threadPool(poolSize)
+, threadPoolSize(poolSize)
+{}
+
+void BookManager::processOrderRequest(OrderRequest& orderRequest)
+{
+	std::shared_ptr<Order> order = orderRequest.toOrder();
+	std::string security = orderRequest.security;
+	
+	size_t threadIndex = getThreadForSecurity(security, threadPoolSize);
+
+	threadPool.enqueue(
+		threadIndex,
+		[this, security, order](){
+			OrderBook* book = nullptr;
+			{
+				std::unique_lock<std::mutex> lock(orderBooksMutex);
+				auto it = orderBooks.find(security);
+				if(it == orderBooks.end())
+				{
+					orderBooks.insert(std::pair<std::string, OrderBook>(security, OrderBook()));
+					it = orderBooks.find(security);
+				}
+				book = &it->second;
+			}
+
+			OrderStatus status = book->processOrder(order);
+
+			if(!book->isActive())
+			{
+				std::unique_lock<std::mutex> lock(orderBooksMutex);
+				orderBooks.erase(security);
+			}
+		}
+	);
+}

@@ -2,22 +2,24 @@
 #define INCLUDED_BOOK_MANAGER
 
 #include <order_book.h>
+#include <order_request.h>
+#include <threadpool.h>
 #include <order.h>
 #include <limit.h>
 
-enum OrderStatus{
-	FILLED;
-	PARTIALLY_FILLED;
-	UNFILLED;
-};
+#include <memory>
 
 class BookManager{
 public:
-	BookManager();
-	OrderStatus processOrderRequest(const ExchangeOrder& order);
+	BookManager(size_t poolSize);
+	void processOrderRequest(OrderRequest& order);
 
 private:
-	OrderBook orderBook;
+	std::unordered_map<std::string, OrderBook> orderBooks;
+	ThreadPool threadPool;
+	size_t threadPoolSize;
+
+	std::mutex orderBooksMutex;
 };
 
 #endif

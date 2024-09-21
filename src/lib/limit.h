@@ -14,7 +14,7 @@ public:
 
 	static std::shared_ptr<Limit> createFirstLimitAtPrice(std::shared_ptr<Order> order, std::shared_ptr<Limit>& root);
 
-	std::shared_ptr<Limit> removeLimit(bool isBuy);
+	std::shared_ptr<Limit> removeLimit(bool isBuy, std::shared_ptr<Limit>& root);
 
 	int price() const{
 		return s_price;

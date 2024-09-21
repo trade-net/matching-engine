@@ -50,12 +50,19 @@ void OrderBook::addOrder(std::shared_ptr<Order> order)
 	orderMap.insert(std::pair<int, std::shared_ptr<Order>>(order->id, order));
 }
 
-
-// isBuy tells us whether we're removing from the buyTree or sellTree
-int OrderBook::removeUnits(int units, bool isBuy, int limit)
+void OrderBook::matchOrder(std::shared_ptr<Order> order, OrderStatus& orderStatus)
 {
+	removeUnits(order->units, !order->isBuy, order->limit, orderStatus.unitsUnfilled, orderStatus.unitsFilled, orderStatus.priceFilled);
+	order->units = orderStatus.unitsUnfilled;
+}
+
+void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled)
+{
+	unitsRemaining = units;
+	priceFilled = 0;
+
 	std::shared_ptr<Limit> current;
-	if(isBuy)
+	if(fromBuyTree)
 	{
 		current = highestBuy;
 	}
@@ -67,14 +74,11 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 	// While there are still units to remove
 	// and we haven't reached the end of the tree
 	// and we haven't hit the removal limit
-	while(units > 0 and current and current->price() >= limit)
+	while(unitsRemaining > 0 and current and (fromBuyTree ? current->price() >= limit : current->price() <= limit))
 	{
 		// if the volume of the current limit is less than the number of units to delete
 		// remove the whole limit from the tree
-		std::cout << "A" << std::endl;
-		std::cout << current->volume()  << std::endl;
-		std::cout << current->price()  << std::endl;
-		if(units >= current->volume())
+		if(unitsRemaining >= current->volume())
 		{
 			// iterate through the orders in the limit and delete them from the map
 			// clean up their memory
@@ -86,15 +90,19 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			units -= current->volume();
+			unitsRemaining -= current->volume();
 			limitMap.erase(current->price());
-			current = current->removeLimit(isBuy);
-			if(isBuy)
+
+			priceFilled += current->volume() * current->price();
+
+			if(fromBuyTree)
 			{
+				current = current->removeLimit(fromBuyTree, buyTree);
 				highestBuy = current;
 			}
 			else
 			{
+				current = current->removeLimit(fromBuyTree, sellTree);
 				lowestSell = current;
 			}
 		}
@@ -104,17 +112,19 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 		{
 			// starting from the head order
 			std::shared_ptr<Order> currentOrder = current->headOrder();
-			while(units)
+			while(unitsRemaining)
 			{
 				// if more units to delete than that of the current order
 				// can just delete the order and update the doubly linked list
-				if(units >= currentOrder->units)
+				if(unitsRemaining >= currentOrder->units)
 				{
 					// decrement the units remaining by the number of shares in current order
 					// update current limit's volume accordingly
-					units -= currentOrder->units;	
+					unitsRemaining -= currentOrder->units;
 					current->decrementVolume(currentOrder->units);
 					orderMap.erase(currentOrder->id);
+
+					priceFilled += currentOrder->units * currentOrder->limit;
 
 					// update headOrder and nextOrder's prevOrder
 					currentOrder->nextOrder->prevOrder = nullptr;
@@ -125,13 +135,30 @@ int OrderBook::removeUnits(int units, bool isBuy, int limit)
 				// update current limit's volume accordingly
 				else
 				{
-					currentOrder->units -= units;
-					current->decrementVolume(units);
-					units = 0;
+					currentOrder->units -= unitsRemaining;
+					current->decrementVolume(unitsRemaining);
+
+					priceFilled += unitsRemaining * currentOrder->limit;
+					unitsRemaining = 0;
 				}
 			}
 		}
 	}
-	return units;
+
+	unitsFilled = units - unitsRemaining;
 }
 
+OrderStatus OrderBook::processOrder(std::shared_ptr<Order> order)
+{
+	OrderStatus orderStatus(order->units);
+
+	matchOrder(order, orderStatus);
+
+	if(order->units and order->limit)
+	{
+		addOrder(order);
+		orderStatus.unitsInBook = order->units;
+	}
+
+	return orderStatus;
+}
