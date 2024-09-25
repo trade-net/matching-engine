@@ -6,7 +6,6 @@
 #include <iostream>
 
 int main(){
-	BookManager manager(4);
 
 	std::vector<OrderRequest> requests;
 	requests.emplace_back(1, true, 10, 100, 1, "AAPL");

@@ -17,7 +17,7 @@ ThreadPool::ThreadPool(size_t numThreads)
 						std::unique_lock<std::mutex> lock(*queueMutexes[i]);
 
 						conditions[i]->wait(lock, [this, i] {
-							return taskQueues[i].empty() || stop;
+							return !taskQueues[i].empty() || stop;
 						});
 
 						if(stop && taskQueues[i].empty())
