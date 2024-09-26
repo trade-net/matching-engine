@@ -23,17 +23,11 @@ ThreadPool::ThreadPool(size_t numThreads)
 						if(stop && taskQueues[i].empty())
 							return;
 
-						if(!taskQueues[i].empty())
-						{
-							task = std::move(taskQueues[i].front());
-							taskQueues[i].pop();
-						}
+						task = std::move(taskQueues[i].front());
+						taskQueues[i].pop();
 					}
 
-					if(task)
-					{
-						task();
-					}
+					task();
 				}
 			} catch (const std::exception &e) {
 				std::cerr << "Exception in thread " << i << ": " << e.what() << std::endl;

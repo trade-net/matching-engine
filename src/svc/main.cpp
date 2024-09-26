@@ -28,7 +28,7 @@ int main(){
 			i%4,
 			[i]()
 			{
-				std::cout << "Task " << i << " is running on thread " << std::this_thread::get_id() << std::endl;
+				std::cout << "Task " << i << "(" << i%4 << ")" <<  " is running on thread " << std::hash<std::thread::id>{}(std::this_thread::get_id()) << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 		);
