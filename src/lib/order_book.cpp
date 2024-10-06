@@ -145,6 +145,7 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 		}
 	}
 
+	std::cout << "Units Remaining after attempting match: " << unitsRemaining << std::endl;
 	unitsFilled = units - unitsRemaining;
 }
 

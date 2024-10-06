@@ -2,7 +2,7 @@
 #include <tcp_async_server.h>
 
 int main(){
-	MatcherRequestProcessor processor(4, 4);
+	MatcherRequestProcessor processor(1, 1);
 	TcpAsyncServer server(processor);
 	server.run();
 	return 0;
