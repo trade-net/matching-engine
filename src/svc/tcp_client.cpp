@@ -69,7 +69,7 @@ int main() {
         client.sendMessage(order.SerializeAsString());
 
         order.set_id(2);
-        order.set_is_buy(false);
+        order.set_is_buy(true);
         order.set_limit(100);
         order.set_units(2);
         order.set_timestamp(2);

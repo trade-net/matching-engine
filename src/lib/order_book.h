@@ -34,7 +34,7 @@ public:
 	void removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled);
 
 	bool isActive(){
-		return buyTree and sellTree;
+		return buyTree or sellTree;
 	}
 
 	// for testing
