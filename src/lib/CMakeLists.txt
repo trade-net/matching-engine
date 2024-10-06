@@ -1,13 +1,19 @@
 add_library(sxchangelib
-	book_manager.cpp
+	matcher_request_processor.cpp
 	order_book.cpp
 	limit.cpp
-	order.cpp
-	threadpool.cpp
+	partitioned_threadpool.cpp
 )
 
-target_link_libraries(sxchangelib PRIVATE
+find_package(networklib REQUIRED)
+
+target_link_libraries(sxchangelib PUBLIC
 	pthread
+	networklib
+	protolib
 )
 
-target_include_directories(sxchangelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(sxchangelib PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}
+	/usr/local/include/networklib
+)

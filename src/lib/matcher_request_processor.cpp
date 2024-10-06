@@ -1,4 +1,4 @@
-#include <book_manager.h>
+#include <matcher_request_processor.h>
 #include <memory>
 
 size_t getThreadForSecurity(const std::string& security, size_t poolSize)
@@ -7,15 +7,20 @@ size_t getThreadForSecurity(const std::string& security, size_t poolSize)
 	return hasher(security) % poolSize;
 }
 
-BookManager::BookManager(size_t poolSize)
-: threadPool(poolSize)
+MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize, size_t RPPoolSize)
+: RequestProcessor(RPPoolSize)
+, threadPool(poolSize)
 , threadPoolSize(poolSize)
-{}
-
-void BookManager::processOrderRequest(OrderRequest& orderRequest)
 {
-	std::shared_ptr<Order> order = orderRequest.toOrder();
-	std::string security = orderRequest.security;
+	registerHandler<OrderRequest, int>("getOrder", [this](const OrderRequest& order){
+		return processOrderRequest(order);
+	});
+}
+
+int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderRequest)
+{
+	std::shared_ptr<Order> order = Order::fromOrderRequest(orderRequest);
+	const std::string& security = order->security;
 	
 	size_t threadIndex = getThreadForSecurity(security, threadPoolSize);
 
@@ -43,4 +48,6 @@ void BookManager::processOrderRequest(OrderRequest& orderRequest)
 			}
 		}
 	);
+
+	return 0;
 }

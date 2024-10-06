@@ -1,7 +1,7 @@
-#include <threadpool.h>
+#include <partitioned_threadpool.h>
 #include <iostream>
 
-ThreadPool::ThreadPool(size_t numThreads)
+PartitionedThreadPool::PartitionedThreadPool(size_t numThreads)
 {
 	taskQueues.resize(numThreads);
 	queueMutexes.resize(numThreads);
@@ -43,7 +43,7 @@ ThreadPool::ThreadPool(size_t numThreads)
 	}
 }
 
-void ThreadPool::enqueue(size_t threadIndex, std::function<void()> task)
+void PartitionedThreadPool::enqueue(size_t threadIndex, std::function<void()> task)
 {
 	{
 		std::unique_lock<std::mutex> lock(*queueMutexes[threadIndex]);
@@ -52,7 +52,7 @@ void ThreadPool::enqueue(size_t threadIndex, std::function<void()> task)
 	conditions[threadIndex]->notify_one();
 }
 
-ThreadPool::~ThreadPool()
+PartitionedThreadPool::~PartitionedThreadPool()
 {
 	{
 		for(size_t i = 0; i < workers.size(); ++i)
