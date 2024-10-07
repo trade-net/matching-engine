@@ -28,7 +28,7 @@ void OrderBook::addFirstOrderAtLimit(std::shared_ptr<Order> order)
 
 	limitMap.insert(std::pair<int, std::shared_ptr<Limit>>(order->limit, limit));
 	
-	std::cout << "Added first order at limit $" << order->limit << std::endl;
+	std::cout << "Created " << (order->isBuy ? "buy" : "sell") << " limit=" << order->limit << " and added order id=" << order->id << ", units=" << order->units << std::endl;
 }
 
 
@@ -38,7 +38,7 @@ void OrderBook::addOrder(std::shared_ptr<Order> order)
 	{
 		std::shared_ptr<Limit> limitPtr = it->second;
 		order->prevOrder = limitPtr->addOrderToLimit(order);
-		std::cout << "Added order to limit $" << order->limit << " size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
+		std::cout << "Added order id=" << order->id << ", units=" << order->units << " to " << (order->isBuy ? "buy" : "sell") << " limit=" << order->limit << ". New size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
 
 	}
 	else
@@ -145,15 +145,24 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 		}
 	}
 
-	std::cout << "Units Remaining after attempting match: " << unitsRemaining << std::endl;
 	unitsFilled = units - unitsRemaining;
 }
 
 OrderStatus OrderBook::processOrder(std::shared_ptr<Order> order)
 {
+	std::cout << "Processing order id=" << order->id
+		<< ", isBuy=" << order->isBuy
+		<< ", units=" << order->units
+		<< ", limit=" << order->limit
+		<< ", timestamp=" << order->timestamp
+		<< ", security=" << order->security
+		<< std::endl;
+
 	OrderStatus orderStatus(order->units);
 
 	matchOrder(order, orderStatus);
+
+	std::cout << "Order id=" << order->id << ": " << order->units << " units remaining after matching" << std::endl;
 
 	if(order->units and order->limit)
 	{

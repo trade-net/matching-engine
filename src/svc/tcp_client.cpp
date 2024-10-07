@@ -69,10 +69,17 @@ int main() {
         client.sendMessage(order.SerializeAsString());
 
         order.set_id(2);
-        order.set_is_buy(true);
-        order.set_limit(100);
         order.set_units(2);
         order.set_timestamp(2);
+        client.sendMessage(order.SerializeAsString());
+
+        order.set_id(3);
+        order.set_units(15);
+        order.set_is_buy(false);
+        order.set_timestamp(3);
+        client.sendMessage(order.SerializeAsString());
+
+        order.set_security("TSLA");
         client.sendMessage(order.SerializeAsString());
         client.sendMessage("\n");
         
