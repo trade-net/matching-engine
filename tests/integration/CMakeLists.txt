@@ -1,17 +1,17 @@
-add_executable(sxchange.t
+add_executable(matcher.t
 	order_book.t.cpp
 )
 
-target_link_libraries(sxchange.t PRIVATE
+target_link_libraries(matcher.t PRIVATE
 	gtest
 	gtest_main
 	rt
 	pthread
 	gmock
-	sxchangelib
+	matcherlib
 )
 
 add_test(
-	NAME sxchange.t
-	COMMAND sxchange.t
+	NAME matcher.t
+	COMMAND matcher.t
 )

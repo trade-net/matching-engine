@@ -1,5 +1,5 @@
-#ifndef INCLUDED_THREADPOOL
-#define INCLUDED_THREADPOOL
+#ifndef INCLUDED_PARTITIONED_THREADPOOL
+#define INCLUDED_PARTITIONED_THREADPOOL
 
 #include <vector>
 #include <queue>
@@ -9,13 +9,13 @@
 #include <condition_variable>
 #include <memory>
 
-class ThreadPool{
+class PartitionedThreadPool{
 public:
-	ThreadPool(size_t numThreads);
+	PartitionedThreadPool(size_t numThreads);
 
 	void enqueue(size_t threadInIndex, std::function<void()> task);
 	
-	~ThreadPool();
+	~PartitionedThreadPool();
 
 private:
 	std::vector<std::thread> workers;
