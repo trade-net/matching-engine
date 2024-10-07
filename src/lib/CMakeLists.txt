@@ -1,4 +1,4 @@
-add_library(sxchangelib
+add_library(matcherlib
 	matcher_request_processor.cpp
 	order_book.cpp
 	limit.cpp
@@ -7,13 +7,13 @@ add_library(sxchangelib
 
 find_package(networklib REQUIRED)
 
-target_link_libraries(sxchangelib PUBLIC
+target_link_libraries(matcherlib PUBLIC
 	pthread
 	networklib
 	protolib
 )
 
-target_include_directories(sxchangelib PUBLIC
+target_include_directories(matcherlib PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
 	/usr/local/include/networklib
 )
