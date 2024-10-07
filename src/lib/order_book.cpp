@@ -95,6 +95,11 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 
 			priceFilled += current->volume() * current->price();
 
+			std::cout << "Incoming order matched all orders at " << (fromBuyTree ? "buy" : "sell") << " limit=" << current->price()
+				<< ", size=" << current->size()
+				<< ", volume=" << current->volume()
+				<< std::endl;
+
 			if(fromBuyTree)
 			{
 				current = current->removeLimit(fromBuyTree, buyTree);
@@ -105,11 +110,17 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 				current = current->removeLimit(fromBuyTree, sellTree);
 				lowestSell = current;
 			}
+
 		}
 
 		// if not, remove the remaining units from the current limit
 		else
 		{
+			std::cout << "Incoming order partial match with " << (fromBuyTree ? "buy" : "sell") << " limit=" << current->price()
+				<< ", size=" << current->size()
+				<< ", volume=" << current->volume()
+				<< ": units matched = " << unitsRemaining
+				<< std::endl;
 			// starting from the head order
 			std::shared_ptr<Order> currentOrder = current->headOrder();
 			while(unitsRemaining)
