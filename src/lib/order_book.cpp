@@ -133,6 +133,7 @@ void OrderBook::removeUnits(int units, bool fromBuyTree, int limit, int& unitsRe
 					// update current limit's volume accordingly
 					unitsRemaining -= currentOrder->units;
 					current->decrementVolume(currentOrder->units);
+					current->decrementSize();
 					orderMap.erase(currentOrder->id);
 
 					priceFilled += currentOrder->units * currentOrder->limit;

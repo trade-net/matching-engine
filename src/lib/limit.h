@@ -33,6 +33,11 @@ public:
 		s_volume -= amount;
 	}
 
+	void decrementSize()
+	{
+		--s_size;
+	}
+
 	std::shared_ptr<Order> headOrder() const{
 		return s_headOrder;
 	}
