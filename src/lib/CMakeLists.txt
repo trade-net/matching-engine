@@ -13,7 +13,8 @@ target_link_libraries(matcherlib PUBLIC
 	protolib
 )
 
+message(STATUS, ${networklib_INCLUDE_DIR})
+
 target_include_directories(matcherlib PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
-	/usr/local/include/networklib
 )
