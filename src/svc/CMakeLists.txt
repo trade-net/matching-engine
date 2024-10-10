@@ -9,12 +9,15 @@ target_link_libraries(matcher PRIVATE
 install(TARGETS matcher RUNTIME COMPONENT matcher)
 
 add_executable(client
-	tcp_client.cpp
+	client.cpp
 )
+
+find_package(networklib REQUIRED)
 
 target_link_libraries(client PRIVATE
 	protolib	
 	pthread
+	networklib
 )
 
 install(TARGETS client RUNTIME COMPONENT client)
