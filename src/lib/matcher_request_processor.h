@@ -10,7 +10,7 @@
 
 #include <memory>
 
-class MatcherRequestProcessor: public RequestProcessor{
+class MatcherRequestProcessor: public network::RequestProcessor{
 public:
 	MatcherRequestProcessor(size_t poolSize, size_t RPPoolSize);
 	int processOrderRequest(const OrderRequest& order);
