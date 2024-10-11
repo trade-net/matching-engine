@@ -12,7 +12,7 @@ MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize, size_t RPPoolS
 , threadPool(poolSize)
 , threadPoolSize(poolSize)
 {
-	registerHandler<OrderRequest, int>("getOrder", [this](const OrderRequest& order){
+	registerHandler<OrderRequest, int>([this](const OrderRequest& order){
 		return processOrderRequest(order);
 	});
 }

@@ -19,33 +19,34 @@ int main() {
 		order.set_timestamp(1);
 		order.set_security("AAPL");
 
-        response = client.send("getOrder", order.SerializeAsString());
+        response = client.send(0, order.SerializeAsString());
         std::cout << response << std::endl;
 
         order.set_id(2);
         order.set_units(2);
         order.set_timestamp(2);
-        response = client.send("getOrder", order.SerializeAsString());
+        response = client.send(0, order.SerializeAsString());
         std::cout << response << std::endl;
 
         order.set_id(3);
         order.set_units(8);
         order.set_is_buy(false);
         order.set_timestamp(3);
-        response = client.send("getOrder", order.SerializeAsString());
+        response = client.send(0, order.SerializeAsString());
         std::cout << response << std::endl;
 
         order.set_id(4);
         order.set_units(7);
         order.set_timestamp(4);
-        response = client.send("getOrder", order.SerializeAsString());
+        response = client.send(0, order.SerializeAsString());
         std::cout << response << std::endl;
 
         order.set_security("TSLA");
-        response = client.send("getOrder", order.SerializeAsString());
+        response = client.send(0, order.SerializeAsString());
         std::cout << response << std::endl;
 
-        client.send("", "\n");
+        response = client.send(127, "");
+        std::cout << response << std::endl;
         
         // You can continue sending more messages without closing the connection
         // client.sendMessage("Another message");
