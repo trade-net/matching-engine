@@ -47,7 +47,7 @@ public:
 	OrderStatus matchOrder(std::shared_ptr<Order> order);
 
 	bool isActive(){
-		return !buyTree.empty() and !sellTree.empty();
+		return !buyTree.empty() or !sellTree.empty();
 	}
 
 	// for testing

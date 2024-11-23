@@ -44,6 +44,11 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 	OrderStatus orderStatus(order->units);
 	if(!order->isBuy)
 	{
+		if(buyTree.empty())
+		{
+			std::cout << "buyTree empty, skipping match" << std::endl;
+			return orderStatus;
+		}
 		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
 		{
 			if(orderStatus.unitsUnfilled == 0 or it->first < order->limit)
@@ -61,6 +66,11 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 	}
 	else
 	{
+		if(sellTree.empty())
+		{
+			std::cout << "sellTree empty, skipping match" << std::endl;
+			return orderStatus;
+		}
 		for(auto it=sellTree.begin(); it != sellTree.end();)
 		{
 			if(orderStatus.unitsUnfilled == 0 or it->first > order->limit)
