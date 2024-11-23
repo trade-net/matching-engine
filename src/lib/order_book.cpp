@@ -69,7 +69,7 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 			std::cout << "sellTree empty, skipping match" << std::endl;
 			return orderStatus;
 		}
-		for(auto it=sellTree.rbegin(); it != sellTree.end();)
+		for(auto it=sellTree.begin(); it != sellTree.end();)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or

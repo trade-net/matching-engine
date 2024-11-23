@@ -72,8 +72,6 @@ public:
 private:
 	std::map<int, std::shared_ptr<Limit>> buyTree;
 	std::map<int, std::shared_ptr<Limit>> sellTree;
-	std::map<int, std::shared_ptr<Limit>>::reverse_iterator highestBuy = buyTree.rend();
-	std::map<int, std::shared_ptr<Limit>>::iterator lowestSell = sellTree.end();
 
 	std::unordered_map<int, std::shared_ptr<Limit>> limitMap;
 	std::unordered_map<int, std::shared_ptr<Order>> orderMap;
