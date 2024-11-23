@@ -51,13 +51,11 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 		}
 		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
 		{
-			if(orderStatus.unitsUnfilled == 0 or it->first < order->limit)
-			{
-				break;
-			}
-
-			if(!matchWithLimit(orderStatus, it->second))
-			{
+			if(
+				orderStatus.unitsUnfilled == 0 or 
+				it->first < order->limit or
+				!matchWithLimit(orderStatus, it->second)
+			){
 				break;
 			}
 
@@ -73,13 +71,11 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 		}
 		for(auto it=sellTree.begin(); it != sellTree.end();)
 		{
-			if(orderStatus.unitsUnfilled == 0 or it->first > order->limit)
-			{
-				break;
-			}
-
-			if(!matchWithLimit(orderStatus, it->second))
-			{
+			if(
+				orderStatus.unitsUnfilled == 0 or
+				it->first > order->limit or
+				!matchWithLimit(orderStatus, it->second)
+			){
 				break;
 			}
 
