@@ -9,19 +9,11 @@ void OrderBook::addFirstOrderAtLimit(std::shared_ptr<Order> order)
 	std::shared_ptr<Limit> limit = std::make_shared<Limit>(order);
 	if(order->isBuy)
 	{
-		auto it = buyTree.emplace(order->limit, limit).first;
-		if(highestBuy == buyTree.rend() or order->limit > highestBuy->first)
-		{
-			highestBuy = std::make_reverse_iterator(it);
-		}
+		buyTree.emplace(order->limit, limit).first;
 	}
 	else
 	{
-		auto it = sellTree.emplace(order->limit, limit).first;
-		if(lowestSell == sellTree.end() or order->limit < lowestSell->first)
-		{
-			lowestSell = it;
-		}
+		sellTree.emplace(order->limit, limit).first;
 	}
 
 	limitMap.emplace(order->limit, limit);
@@ -57,7 +49,7 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 			std::cout << "buyTree empty, skipping match" << std::endl;
 			return orderStatus;
 		}
-		for(auto it=highestBuy; it != buyTree.rend();)
+		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or 
@@ -77,7 +69,7 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 			std::cout << "sellTree empty, skipping match" << std::endl;
 			return orderStatus;
 		}
-		for(auto it=lowestSell; it != sellTree.end();)
+		for(auto it=sellTree.rbegin(); it != sellTree.end();)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or
