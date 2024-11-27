@@ -18,6 +18,20 @@ struct OrderStatus{
 
 	OrderStatus();
 
+	void fill(int units, int price)
+	{
+		unitsFilled += units;
+		priceFilled += units*price;
+		unitsUnfilled -= units;
+	}
+
+	void fillRemaining(int price)
+	{
+		unitsFilled += unitsUnfilled;
+		priceFilled += unitsUnfilled*price;
+		unitsUnfilled = 0;
+	}
+
 	int totalUnits;
 	int unitsUnfilled;
 	int unitsInBook;
@@ -30,11 +44,10 @@ public:
 	OrderBook();
 	OrderStatus processOrder(std::shared_ptr<Order> order);
 	void addOrder(std::shared_ptr<Order> order);
-	void matchOrder(std::shared_ptr<Order> order, OrderStatus& orderStatus);
-	void removeUnits(int units, bool fromBuyTree, int limit, int& unitsRemaining, int& unitsFilled, int& priceFilled);
+	OrderStatus matchOrder(std::shared_ptr<Order> order);
 
 	bool isActive(){
-		return buyTree or sellTree;
+		return !buyTree.empty() or !sellTree.empty();
 	}
 
 	// for testing
@@ -49,26 +62,24 @@ public:
 	}
 
 	int getHighestBuy() const{
-		return highestBuy->price();
+		return buyTree.rbegin()->first;
 	}
 
 	int getLowestSell() const{
-		return lowestSell->price();
-	}
-
-	int getBuyTreeRoot() const{
-		return buyTree->price();
+		return sellTree.begin()->first;
 	}
 
 private:
-	std::shared_ptr<Limit> buyTree = nullptr;
-	std::shared_ptr<Limit> sellTree = nullptr;
-	std::shared_ptr<Limit> lowestSell = nullptr;
-	std::shared_ptr<Limit> highestBuy = nullptr;
+	std::map<int, std::shared_ptr<Limit>> buyTree;
+	std::map<int, std::shared_ptr<Limit>> sellTree;
+
 	std::unordered_map<int, std::shared_ptr<Limit>> limitMap;
 	std::unordered_map<int, std::shared_ptr<Order>> orderMap;
-
 	void addFirstOrderAtLimit(std::shared_ptr<Order> order);
+
+	// match orderStatus.unfilledOrders with orders in the current Limit
+	// returns true if all orders in current is matched, false otherwise
+	bool matchWithLimit(OrderStatus& orderStatus, std::shared_ptr<Limit> current);
 };
 
 #endif

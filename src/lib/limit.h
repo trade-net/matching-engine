@@ -12,10 +12,6 @@ public:
 
 	std::shared_ptr<Order> addOrderToLimit(std::shared_ptr<Order> order);
 
-	static std::shared_ptr<Limit> createFirstLimitAtPrice(std::shared_ptr<Order> order, std::shared_ptr<Limit>& root);
-
-	std::shared_ptr<Limit> removeLimit(bool isBuy, std::shared_ptr<Limit>& root);
-
 	int price() const{
 		return s_price;
 	}
@@ -55,9 +51,6 @@ private:
 	int s_price;
 	int s_size; // number of Orders
 	int s_volume; // number of units
-	std::shared_ptr<Limit> s_parent;
-	std::shared_ptr<Limit> s_leftChild;
-	std::shared_ptr<Limit> s_rightChild;
 	std::shared_ptr<Order> s_headOrder;
 	std::shared_ptr<Order> s_tailOrder;
 };
