@@ -6,8 +6,6 @@
 
 class Limit{
 public:
-	Limit(std::shared_ptr<Order> order, std::shared_ptr<Limit> parent);
-
 	Limit(std::shared_ptr<Order> order);
 
 	std::shared_ptr<Order> addOrderToLimit(std::shared_ptr<Order> order);

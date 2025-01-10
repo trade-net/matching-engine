@@ -1,14 +1,6 @@
 #include <limit.h>
 #include <iostream>
 
-Limit::Limit(std::shared_ptr<Order> order, std::shared_ptr<Limit> parent)
-: s_price(order->limit)
-, s_size(1)
-, s_volume(order->units)
-, s_headOrder(order)
-, s_tailOrder(order)
-{}
-
 Limit::Limit(std::shared_ptr<Order> order)
 : s_price(order->limit)
 , s_size(1)
