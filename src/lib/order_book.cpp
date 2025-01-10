@@ -9,11 +9,11 @@ void OrderBook::addFirstOrderAtLimit(std::shared_ptr<Order> order)
 	std::shared_ptr<Limit> limit = std::make_shared<Limit>(order);
 	if(order->isBuy)
 	{
-		buyTree.emplace(order->limit, limit).first;
+		buyTree.emplace(order->limit, limit);
 	}
 	else
 	{
-		sellTree.emplace(order->limit, limit).first;
+		sellTree.emplace(order->limit, limit);
 	}
 
 	limitMap.emplace(order->limit, limit);
