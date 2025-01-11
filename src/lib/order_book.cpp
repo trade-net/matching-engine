@@ -27,7 +27,7 @@ void OrderBook::addOrder(std::shared_ptr<Order> order)
 	if(auto it = limitMap.find(order->limit); it != limitMap.end())
 	{
 		std::shared_ptr<Limit> limitPtr = it->second;
-		order->prevOrder = limitPtr->addOrderToLimit(order);
+		limitPtr->addOrderToLimit(order);
 		std::cout << "Added order id=" << order->id << ", units=" << order->units << " to " << (order->isBuy ? "buy" : "sell") << " limit=" << order->limit << ". New size=" << limitPtr->size() << " volume=" << limitPtr->volume() << std::endl;
 
 	}
@@ -93,23 +93,22 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, std::shared_ptr<Limit> 
 	// remove the whole limit from the tree
 	if(orderStatus.unitsUnfilled >= current->volume())
 	{
-		// iterate through the orders in the limit and delete them from the map
-		// clean up their memory
-		std::shared_ptr<Order> currentOrder = current->headOrder();
-		while(currentOrder)
-		{
-			orderMap.erase(currentOrder->id);
-			currentOrder = currentOrder->nextOrder;
-		}
-
-		// remove the limit from the tree and map, clean up memory
-		orderStatus.fill(current->volume(), current->price());
-		limitMap.erase(current->price());
-
 		std::cout << "Incoming order matched all orders at limit=" << current->price()
 			<< ", size=" << current->size()
 			<< ", volume=" << current->volume()
 			<< std::endl;
+
+		orderStatus.fill(current->volume(), current->price());
+
+		// iterate through the orders in the limit and delete them from the map
+		// clean up their memory
+		while(current->size())
+		{
+			orderMap.erase(current->deleteHeadOrder()->id);
+		}
+
+		// remove the limit from the tree and map, clean up memory
+		limitMap.erase(current->price());
 
 		return true;
 	}
@@ -122,34 +121,25 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, std::shared_ptr<Limit> 
 			<< ", volume=" << current->volume()
 			<< ": units matched = " << orderStatus.unitsUnfilled
 			<< std::endl;
+
 		// starting from the head order
-		std::shared_ptr<Order> currentOrder = current->headOrder();
 		while(orderStatus.unitsUnfilled)
 		{
 			// if more units to delete than that of the current order
 			// can just delete the order and update the doubly linked list
-			if(orderStatus.unitsUnfilled >= currentOrder->units)
+			if(orderStatus.unitsUnfilled >= current->headOrder()->units)
 			{
 				// decrement the units remaining by the number of shares in current order
 				// update current limit's volume accordingly
-				orderStatus.fill(currentOrder->units, currentOrder->limit);
-				current->decrementVolume(currentOrder->units);
-				current->decrementSize();
-				orderMap.erase(currentOrder->id);
-
-				// update headOrder and nextOrder's prevOrder
-				currentOrder->nextOrder->prevOrder = nullptr;
-				currentOrder = currentOrder->nextOrder;
-				current->setHeadOrder(currentOrder);
+				orderStatus.fill(current->headOrder()->units, current->price());
+				orderMap.erase(current->deleteHeadOrder()->id);
 			}
 			// if not, subtract the remaining units from the current order
 			// update current limit's volume accordingly
 			else
 			{
-				currentOrder->units -= orderStatus.unitsUnfilled;
-				current->decrementVolume(orderStatus.unitsUnfilled);
-
-				orderStatus.fillRemaining(currentOrder->limit);
+				current->decrementHeadOrder(orderStatus.unitsUnfilled);
+				orderStatus.fillRemaining(current->price());
 			}
 		}
 	}

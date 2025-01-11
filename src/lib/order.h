@@ -45,9 +45,6 @@ public:
 	int limit;
 	int timestamp;
 	std::string security;
-	std::shared_ptr<Order> nextOrder = nullptr;
-	std::shared_ptr<Order> prevOrder = nullptr;
-	std::shared_ptr<Limit> parentLimit = nullptr;
 };
 
 #endif

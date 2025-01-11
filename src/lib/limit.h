@@ -3,12 +3,13 @@
 
 #include <order.h>
 #include <memory>
+#include <vector>
 
 class Limit{
 public:
 	Limit(std::shared_ptr<Order> order);
 
-	std::shared_ptr<Order> addOrderToLimit(std::shared_ptr<Order> order);
+	void addOrderToLimit(std::shared_ptr<Order> order);
 
 	int price() const{
 		return s_price;
@@ -22,35 +23,20 @@ public:
 		return s_volume;
 	}
 
-	void decrementVolume(int amount)
-	{
-		s_volume -= amount;
+	std::shared_ptr<Order> deleteHeadOrder();
+
+	std::shared_ptr<Order> headOrder(){
+		return s_orders.front();
 	}
 
-	void decrementSize()
-	{
-		--s_size;
-	}
-
-	std::shared_ptr<Order> headOrder() const{
-		return s_headOrder;
-	}
-
-	std::shared_ptr<Order> tailOrder() const{
-		return s_tailOrder;
-	}
-
-	void setHeadOrder(std::shared_ptr<Order> order)
-	{
-		s_headOrder = order;
-	}
+	void decrementHeadOrder(int units);
 
 private:
 	int s_price;
 	int s_size; // number of Orders
 	int s_volume; // number of units
-	std::shared_ptr<Order> s_headOrder;
-	std::shared_ptr<Order> s_tailOrder;
+	std::vector<std::shared_ptr<Order>>::iterator s_currentIt;
+	std::vector<std::shared_ptr<Order>> s_orders;
 };
 
 #endif
