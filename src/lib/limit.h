@@ -35,7 +35,6 @@ private:
 	int s_price;
 	int s_size; // number of Orders
 	int s_volume; // number of units
-	std::vector<std::shared_ptr<Order>>::iterator s_currentIt;
 	std::vector<std::shared_ptr<Order>> s_orders;
 };
 
