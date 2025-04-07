@@ -43,7 +43,7 @@ class OrderBook{
 public:
 	OrderBook();
 	OrderStatus processOrder(std::shared_ptr<Order> order);
-	void addOrder(std::shared_ptr<Order> order);
+	void addOrder(Order&& order);
 	OrderStatus matchOrder(std::shared_ptr<Order> order);
 
 	bool isActive(){
@@ -70,12 +70,10 @@ public:
 	}
 
 private:
-	std::map<int, std::shared_ptr<Limit>> buyTree;
-	std::map<int, std::shared_ptr<Limit>> sellTree;
+	std::map<int, Limit> buyTree;
+	std::map<int, Limit> sellTree;
 
-	std::unordered_map<int, std::shared_ptr<Limit>> limitMap;
-	std::unordered_map<int, std::shared_ptr<Order>> orderMap;
-	void addFirstOrderAtLimit(std::shared_ptr<Order> order);
+	std::unordered_map<int, std::map<int, Limit>::iterator> limitMap;
 
 	// match orderStatus.unfilledOrders with orders in the current Limit
 	// returns true if all orders in current is matched, false otherwise

@@ -7,16 +7,16 @@
 
 class Limit{
 public:
-	Limit(std::shared_ptr<Order> order);
+	Limit(Order&& order);
 
-	void addOrderToLimit(std::shared_ptr<Order> order);
+	void addOrderToLimit(Order&& order);
 
 	int price() const{
 		return s_price;
 	}
 
 	int size() const{
-		return s_size;
+		return s_orders.size();
 	}
 
 	int volume() const{
@@ -33,9 +33,9 @@ public:
 
 private:
 	int s_price;
-	int s_size; // number of Orders
 	int s_volume; // number of units
-	std::vector<std::shared_ptr<Order>> s_orders;
+	std::list<Order> s_orders;
+	std::unordered_map<int, std::list<Order>::iterator> orderMap;
 };
 
 #endif
