@@ -70,16 +70,15 @@ public:
 	}
 
 private:
-	std::map<int, std::shared_ptr<Limit>> buyTree;
-	std::map<int, std::shared_ptr<Limit>> sellTree;
+	std::map<int, Limit> buyTree;
+	std::map<int, Limit> sellTree;
 
-	std::unordered_map<int, std::shared_ptr<Limit>> limitMap;
+	std::unordered_map<int, std::map<int, Limit>::iterator> limitMap;
 	std::unordered_map<int, std::shared_ptr<Order>> orderMap;
-	void addFirstOrderAtLimit(std::shared_ptr<Order> order);
 
 	// match orderStatus.unfilledOrders with orders in the current Limit
 	// returns true if all orders in current is matched, false otherwise
-	bool matchWithLimit(OrderStatus& orderStatus, std::shared_ptr<Limit> current);
+	bool matchWithLimit(OrderStatus& orderStatus, Limit& current);
 };
 
 #endif
