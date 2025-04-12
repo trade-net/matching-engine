@@ -6,12 +6,14 @@ Limit::Limit(std::shared_ptr<Order> order)
 , s_volume(order->units)
 {
 	s_orders.push_back(order);
+	s_orderMap[order->id] = order;
 }
 
 void Limit::addOrderToLimit(std::shared_ptr<Order> order)
 {
 	s_volume += order->units;
 	s_orders.push_back(order);
+	s_orderMap[order->id] = order;
 }
 
 void Limit::fillUnits(int units)
@@ -21,8 +23,9 @@ void Limit::fillUnits(int units)
 		if(units >= head->units){
 			units -= head->units;
 			s_volume -= head->units;
-			orderMap.erase(head->id);
+
 			s_orders.pop_front();
+			s_orderMap.erase(head->id);
 		}
 		else{
 			head->units -= units;

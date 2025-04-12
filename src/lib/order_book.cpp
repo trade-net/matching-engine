@@ -9,15 +9,18 @@ void OrderBook::addOrder(std::shared_ptr<Order> order)
 {
 	if(auto it = limitMap.find(order->limit); it != limitMap.end()){
 		it->second->second.addOrderToLimit(order);
+		orderToLimitMap[order->id] = it->second;
 	}
 	else{
 		if(order->isBuy){
 			auto [mapIt, _] = buyTree.emplace(order->limit, Limit(order));
 			limitMap[order->limit] = mapIt;
+			orderToLimitMap[order->id] = mapIt;
 		}
 		else{
 			auto [mapIt, _] = sellTree.emplace(order->limit, Limit(order));
 			limitMap[order->limit] = mapIt;
+			orderToLimitMap[order->id] = mapIt;
 		}
 	}	
 
@@ -25,6 +28,7 @@ void OrderBook::addOrder(std::shared_ptr<Order> order)
 
 OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 {
+	std::cout << "Matching Order " << order->id << std::endl;
 	OrderStatus orderStatus(order->units);
 	if(!order->isBuy)
 	{

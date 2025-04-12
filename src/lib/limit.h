@@ -28,11 +28,15 @@ public:
 
 	void fillUnits(int units);
 
+	bool find(int id){
+		return s_orderMap.find(id) != s_orderMap.end();
+	}
+
 private:
 	int s_price;
 	int s_volume; // number of units
 	std::list<std::shared_ptr<Order>> s_orders;
-	std::unordered_map<int, std::list<std::shared_ptr<Order>>::iterator> orderMap;
+	std::unordered_map<int, std::shared_ptr<Order>> s_orderMap;
 };
 
 #endif

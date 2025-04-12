@@ -57,8 +57,11 @@ public:
 	}
 
 	bool isOrderInMap(int id){
-		auto it = orderMap.find(id);
-		return it != orderMap.end();
+		if(auto it = orderToLimitMap.find(id); it != orderToLimitMap.end()){
+			return it->second->second.find(id);
+		}
+
+		return false;
 	}
 
 	int getHighestBuy() const{
@@ -74,7 +77,7 @@ private:
 	std::map<int, Limit> sellTree;
 
 	std::unordered_map<int, std::map<int, Limit>::iterator> limitMap;
-	std::unordered_map<int, std::shared_ptr<Order>> orderMap;
+	std::unordered_map<int, std::map<int, Limit>::iterator> orderToLimitMap;
 
 	// match orderStatus.unfilledOrders with orders in the current Limit
 	// returns true if all orders in current is matched, false otherwise
