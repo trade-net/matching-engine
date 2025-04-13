@@ -3,27 +3,40 @@
 
 Limit::Limit(std::shared_ptr<Order> order)
 : s_price(order->limit)
-, s_size(1)
 , s_volume(order->units)
 {
-	s_orders.emplace_back(order);
+	s_orders.push_back(order);
+	s_orderMap[order->id] = s_orders.begin();
 }
 
 void Limit::addOrderToLimit(std::shared_ptr<Order> order)
 {
-	s_size += 1;
 	s_volume += order->units;
-	s_orders.emplace_back(order);
+	s_orders.push_back(order);
+	s_orderMap[order->id] = s_orders.end()--;
 }
 
-std::shared_ptr<Order> Limit::deleteHeadOrder()
+std::vector<int> Limit::fillUnits(int units)
 {
-	auto head = s_orders.front();
-	s_size -= 1;
-	s_volume -= head->units;
-	s_orders.erase(s_orders.begin());
+	std::vector<int> filledOrders;
+	while(units){
+		auto head = s_orders.front();
+		if(units >= head->units){
+			units -= head->units;
+			s_volume -= head->units;
 
-	return head;
+			filledOrders.push_back(head->id);
+			s_orders.pop_front();
+			s_orderMap.erase(head->id);
+		}
+		else{
+			head->units -= units;
+			s_volume -= units;
+			units = 0;
+		}
+	}
+
+	return filledOrders;
 }
 
 void Limit::decrementHeadOrder(int units)

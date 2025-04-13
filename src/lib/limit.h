@@ -4,6 +4,7 @@
 #include <order.h>
 #include <memory>
 #include <vector>
+#include <list>
 
 class Limit{
 public:
@@ -16,26 +17,35 @@ public:
 	}
 
 	int size() const{
-		return s_size;
+		return s_orders.size();
 	}
 
 	int volume() const{
 		return s_volume;
 	}
 
-	std::shared_ptr<Order> deleteHeadOrder();
+	void decrementHeadOrder(int units);
 
-	std::shared_ptr<Order> headOrder(){
-		return s_orders.front();
+	std::vector<int> fillUnits(int units);
+
+	std::vector<int> getOrders(){
+		std::vector<int> orders;
+		for(const auto& pair: s_orderMap){
+			orders.push_back(pair.first);
+		}
+
+		return orders;
 	}
 
-	void decrementHeadOrder(int units);
+	bool find(int id){
+		return s_orderMap.find(id) != s_orderMap.end();
+	}
 
 private:
 	int s_price;
-	int s_size; // number of Orders
 	int s_volume; // number of units
-	std::vector<std::shared_ptr<Order>> s_orders;
+	std::list<std::shared_ptr<Order>> s_orders;
+	std::unordered_map<int, std::list<std::shared_ptr<Order>>::iterator> s_orderMap;
 };
 
 #endif
