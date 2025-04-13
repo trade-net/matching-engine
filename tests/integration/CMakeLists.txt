@@ -1,13 +1,14 @@
+find_package(GTest REQUIRED)
+
 add_executable(matcher.t
 	order_book.t.cpp
 )
 
 target_link_libraries(matcher.t PRIVATE
-	gtest
-	gtest_main
-	rt
+	GTest::gtest
+	GTest::gtest_main
+	GTest::gmock
 	pthread
-	gmock
 	matcherlib
 )
 
