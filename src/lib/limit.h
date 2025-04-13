@@ -29,7 +29,7 @@ public:
 	std::vector<int> fillUnits(int units);
 
 	std::vector<int> getOrders(){
-		std::vector<int> orders;
+		std::vector<int> orders(s_orderMap.size());
 		for(const auto& pair: s_orderMap){
 			orders.push_back(pair.first);
 		}
