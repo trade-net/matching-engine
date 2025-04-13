@@ -26,7 +26,16 @@ public:
 
 	void decrementHeadOrder(int units);
 
-	void fillUnits(int units);
+	std::vector<int> fillUnits(int units);
+
+	std::vector<int> getOrders(){
+		std::vector<int> orders;
+		for(const auto& pair: s_orderMap){
+			orders.push_back(pair.first);
+		}
+
+		return orders;
+	}
 
 	bool find(int id){
 		return s_orderMap.find(id) != s_orderMap.end();
@@ -36,7 +45,7 @@ private:
 	int s_price;
 	int s_volume; // number of units
 	std::list<std::shared_ptr<Order>> s_orders;
-	std::unordered_map<int, std::shared_ptr<Order>> s_orderMap;
+	std::unordered_map<int, std::list<std::shared_ptr<Order>>::iterator> s_orderMap;
 };
 
 #endif

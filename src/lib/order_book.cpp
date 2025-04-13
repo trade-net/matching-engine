@@ -43,7 +43,6 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			limitMap.erase(it->second.price());
 			it = std::make_reverse_iterator(buyTree.erase(std::prev(it.base())));
 		}
 	}
@@ -60,7 +59,6 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			limitMap.erase(it->second.price());
 			it = sellTree.erase(it);
 		}
 	}
@@ -78,8 +76,12 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 			<< ", volume=" << current.volume()
 			<< std::endl;
 
+		for(auto& id : current.getOrders())
+		{
+			orderToLimitMap.erase(id);
+		}
+		limitMap.erase(current.price());
 		orderStatus.fill(current.volume(), current.price());
-
 		return true;
 	}
 
@@ -90,7 +92,11 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 		<< ": units matched = " << orderStatus.unitsUnfilled
 		<< std::endl;
 	
-	current.fillUnits(orderStatus.unitsUnfilled);
+	auto ordersToDelete = current.fillUnits(orderStatus.unitsUnfilled);
+	for(auto& id : ordersToDelete)
+	{
+		orderToLimitMap.erase(id);
+	}
 	orderStatus.fillRemaining(current.price());
 
 	return false;
