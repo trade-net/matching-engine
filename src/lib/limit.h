@@ -30,8 +30,9 @@ public:
 
 	std::vector<int> getOrders(){
 		std::vector<int> orders(s_orderMap.size());
+		int i=0;
 		for(const auto& pair: s_orderMap){
-			orders.push_back(pair.first);
+			orders[i++] = pair.first;
 		}
 
 		return orders;
