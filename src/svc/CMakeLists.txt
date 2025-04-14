@@ -21,4 +21,3 @@ target_link_libraries(client PRIVATE
 )
 
 install(TARGETS client RUNTIME COMPONENT client)
-

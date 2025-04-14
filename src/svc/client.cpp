@@ -5,19 +5,19 @@
 
 int main() {
     try {
-    	std::string ip = "127.0.0.1";
-    	std::string port = "1234";
-    	network::TcpClient client(ip, port);
-    	std::string response;
+        std::string ip = "127.0.0.1";
+        std::string port = "1234";
+        network::TcpClient client(ip, port);
+        std::string response;
 
         // Send messages and wait for responses
-		OrderRequest order;
-		order.set_id(1);
-		order.set_is_buy(true);
-		order.set_units(10);
-		order.set_limit(100);
-		order.set_timestamp(1);
-		order.set_security("AAPL");
+        OrderRequest order;
+        order.set_id(1);
+        order.set_is_buy(true);
+        order.set_units(10);
+        order.set_limit(100);
+        order.set_timestamp(1);
+        order.set_security("AAPL");
 
         response = client.send(order.SerializeAsString());
         std::cout << response << std::endl;
@@ -47,9 +47,6 @@ int main() {
 
         response = client.send(127, "");
         std::cout << static_cast<int>(response.front()) << std::endl;
-        
-        // You can continue sending more messages without closing the connection
-        // client.sendMessage("Another message");
 
     } catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
