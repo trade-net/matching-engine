@@ -1,6 +1,7 @@
 set(UNIT_TEST_SOURCES
     limit.t.cpp
     order_book.t.cpp
+    partitioned_threadpool.t.cpp
 )
 
 # Find Google Test
