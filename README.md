@@ -18,7 +18,7 @@ When the task is picked up, the matcher will attempt to match the incoming order
 If the incoming order is a limit order, and it is still unfilled/partially filled after that, the order is then also added to the order book.
 
 However, the plan is for the matching engine to consume order events from a new sequencer service via UDP multicast in the future.
-The matcher will then be converted into a speculative matching system, which proposes trade events to the sequencer, and have them accepted, before completing its matches.
+The matcher will then also publish trade events to the sequencer when an incoming order matches a resting order.
 This would ensure determinism in the simulation.
 
 ## Future Work
