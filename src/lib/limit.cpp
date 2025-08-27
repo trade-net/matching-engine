@@ -13,7 +13,7 @@ void Limit::addOrderToLimit(std::shared_ptr<Order> order)
 {
 	s_volume += order->units;
 	s_orders.push_back(order);
-	s_orderMap[order->id] = s_orders.end()--;
+	s_orderMap[order->id] = std::prev(s_orders.end());
 }
 
 std::vector<int> Limit::fillUnits(int units)

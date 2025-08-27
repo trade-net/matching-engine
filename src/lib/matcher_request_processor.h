@@ -14,6 +14,7 @@ class MatcherRequestProcessor: public network::RequestProcessor{
 public:
 	MatcherRequestProcessor(size_t poolSize, size_t RPPoolSize);
 	int processOrderRequest(const OrderRequest& order);
+	int processOrderUpdateRequest(const OrderUpdateRequest& orderUpdateRequest);
 
 private:
 	std::unordered_map<std::string, OrderBook> orderBooks;
