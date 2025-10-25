@@ -22,8 +22,8 @@ MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize, size_t RPPoolS
 
 int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderRequest)
 {
-	std::shared_ptr<Order> order = Order::fromOrderRequest(orderRequest);
-	const std::string& security = order->security;
+	Order order = Order::fromOrderRequest(orderRequest);
+	const std::string& security = order.security;
 	
 	size_t threadIndex = getThreadForSecurity(security, threadPoolSize);
 

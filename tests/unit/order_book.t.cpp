@@ -6,8 +6,8 @@
 TEST(OrderBookTest, AddOrderTest) {
     OrderBook orderBook;
 
-    auto order1 = std::make_shared<Order>(1, true, 10, 100, 1, "AAPL");
-    auto order2 = std::make_shared<Order>(2, true, 5, 101, 2, "AAPL");
+    auto order1 = Order(1, true, 10, 100, 1, "AAPL");
+    auto order2 = Order(2, true, 5, 101, 2, "AAPL");
 
     orderBook.addOrder(order1);
     orderBook.addOrder(order2);
@@ -21,8 +21,8 @@ TEST(OrderBookTest, AddOrderTest) {
 TEST(OrderBookTest, MatchOrderTest) {
     OrderBook orderBook;
 
-    auto buyOrder = std::make_shared<Order>(1, true, 10, 100, 1, "AAPL");
-    auto sellOrder = std::make_shared<Order>(2, false, 5, 100, 2, "AAPL");
+    auto buyOrder = Order(1, true, 10, 100, 1, "AAPL");
+    auto sellOrder = Order(2, false, 5, 100, 2, "AAPL");
 
     orderBook.addOrder(buyOrder);
     auto status = orderBook.processOrder(sellOrder);
@@ -37,8 +37,8 @@ TEST(OrderBookTest, MatchOrderTest) {
 TEST(OrderBookTest, PartialMatchTest) {
     OrderBook orderBook;
 
-    auto buyOrder = std::make_shared<Order>(1, true, 10, 100, 1, "AAPL");
-    auto sellOrder = std::make_shared<Order>(2, false, 15, 100, 2, "AAPL");
+    auto buyOrder = Order(1, true, 10, 100, 1, "AAPL");
+    auto sellOrder = Order(2, false, 15, 100, 2, "AAPL");
 
     orderBook.addOrder(buyOrder);
     auto status = orderBook.processOrder(sellOrder);
@@ -54,8 +54,8 @@ TEST(OrderBookTest, PartialMatchTest) {
 TEST(OrderBookTest, NoMatchTest) {
     OrderBook orderBook;
 
-    auto buyOrder = std::make_shared<Order>(1, true, 10, 100, 1, "AAPL");
-    auto sellOrder = std::make_shared<Order>(2, false, 5, 101, 2, "AAPL");
+    auto buyOrder = Order(1, true, 10, 100, 1, "AAPL");
+    auto sellOrder = Order(2, false, 5, 101, 2, "AAPL");
 
     orderBook.addOrder(buyOrder);
     auto status = orderBook.processOrder(sellOrder);
@@ -70,8 +70,8 @@ TEST(OrderBookTest, NoMatchTest) {
 TEST(OrderBookTest, AddAfterPartialMatchTest) {
     OrderBook orderBook;
 
-    auto buyOrder = std::make_shared<Order>(1, true, 10, 100, 1, "AAPL");
-    auto sellOrder = std::make_shared<Order>(2, false, 15, 100, 2, "AAPL");
+    auto buyOrder = Order(1, true, 10, 100, 1, "AAPL");
+    auto sellOrder = Order(2, false, 15, 100, 2, "AAPL");
 
     orderBook.addOrder(buyOrder);
     auto status = orderBook.processOrder(sellOrder);

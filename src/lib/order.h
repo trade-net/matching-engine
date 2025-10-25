@@ -27,9 +27,9 @@ public:
 	, security("")
 	{}
 
-	static std::shared_ptr<Order> fromOrderRequest(const OrderRequest& orderRequest)
+	static Order fromOrderRequest(const OrderRequest& orderRequest)
 	{
-		return std::make_shared<Order>(
+		return Order(
 			orderRequest.id(),
 			orderRequest.is_buy(),
 			orderRequest.units(),

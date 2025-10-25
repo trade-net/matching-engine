@@ -42,9 +42,9 @@ struct OrderStatus{
 class OrderBook{
 public:
 	OrderBook();
-	OrderStatus processOrder(std::shared_ptr<Order> order);
-	void addOrder(std::shared_ptr<Order> order);
-	OrderStatus matchOrder(std::shared_ptr<Order> order);
+	OrderStatus processOrder(Order order);
+	void addOrder(Order order);
+	OrderStatus matchOrder(int units, bool isBuy, int limit);
 
 	bool isActive(){
 		return !buyTree.empty() or !sellTree.empty();

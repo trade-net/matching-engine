@@ -5,38 +5,37 @@
 OrderBook::OrderBook(){}
 
 
-void OrderBook::addOrder(std::shared_ptr<Order> order)
+void OrderBook::addOrder(Order order)
 {
-	if(auto it = limitMap.find(order->limit); it != limitMap.end()){
+	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
 		it->second->second.addOrderToLimit(order);
-		orderToLimitMap[order->id] = it->second;
+		orderToLimitMap[order.id] = it->second;
 	}
 	else{
-		if(order->isBuy){
-			auto [mapIt, _] = buyTree.emplace(order->limit, Limit(order));
-			limitMap[order->limit] = mapIt;
-			orderToLimitMap[order->id] = mapIt;
+		if(order.isBuy){
+			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
+			limitMap[order.limit] = mapIt;
+			orderToLimitMap[order.id] = mapIt;
 		}
 		else{
-			auto [mapIt, _] = sellTree.emplace(order->limit, Limit(order));
-			limitMap[order->limit] = mapIt;
-			orderToLimitMap[order->id] = mapIt;
+			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
+			limitMap[order.limit] = mapIt;
+			orderToLimitMap[order.id] = mapIt;
 		}
 	}	
 
 }
 
-OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
+OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit)
 {
-	std::cout << "Matching Order " << order->id << std::endl;
-	OrderStatus orderStatus(order->units);
-	if(!order->isBuy)
+	OrderStatus orderStatus(units);
+	if(!isBuy)
 	{
 		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or 
-				it->first < order->limit or
+				it->first < limit or
 				!matchWithLimit(orderStatus, it->second)
 			){
 				break;
@@ -52,7 +51,7 @@ OrderStatus OrderBook::matchOrder(std::shared_ptr<Order> order)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or
-				it->first > order->limit or
+				it->first > limit or
 				!matchWithLimit(orderStatus, it->second)
 			){
 				break;
@@ -102,27 +101,27 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	return false;
 }
 
-OrderStatus OrderBook::processOrder(std::shared_ptr<Order> order)
+OrderStatus OrderBook::processOrder(Order order)
 {
-	std::cout << "Processing order id=" << order->id
-		<< ", isBuy=" << order->isBuy
-		<< ", units=" << order->units
-		<< ", limit=" << order->limit
-		<< ", timestamp=" << order->timestamp
-		<< ", security=" << order->security
+	std::cout << "Processing order id=" << order.id
+		<< ", isBuy=" << order.isBuy
+		<< ", units=" << order.units
+		<< ", limit=" << order.limit
+		<< ", timestamp=" << order.timestamp
+		<< ", security=" << order.security
 		<< std::endl;
 
-	OrderStatus orderStatus = matchOrder(order);
+	OrderStatus orderStatus = matchOrder(order.units, order.isBuy, order.limit);
 
 	// update remaining units in order
-	order->units = orderStatus.unitsUnfilled;
+	order.units = orderStatus.unitsUnfilled;
 
-	std::cout << "Order id=" << order->id << ": " << order->units << " units remaining after matching" << std::endl;
+	std::cout << "Order id=" << order.id << ": " << order.units << " units remaining after matching" << std::endl;
 
-	if(order->units and order->limit)
+	if(order.units and order.limit)
 	{
 		addOrder(order);
-		orderStatus.unitsInBook = order->units;
+		orderStatus.unitsInBook = order.units;
 	}
 
 	return orderStatus;
