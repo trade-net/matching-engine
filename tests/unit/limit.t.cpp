@@ -4,7 +4,7 @@
 #include <memory>
 
 TEST(LimitTest, ConstructorInitializesCorrectly) {
-    auto order = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
+    auto order = Order(1, true, 100, 50, 123456, "AAPL");
     Limit limit(order);
 
     EXPECT_EQ(limit.price(), 50);
@@ -13,8 +13,8 @@ TEST(LimitTest, ConstructorInitializesCorrectly) {
 }
 
 TEST(LimitTest, AddOrderToLimit) {
-    auto order1 = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
-    auto order2 = std::make_shared<Order>(2, true, 200, 50, 123457, "AAPL");
+    auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
+    auto order2 = Order(2, true, 200, 50, 123457, "AAPL");
     Limit limit(order1);
 
     limit.addOrderToLimit(order2);
@@ -24,8 +24,8 @@ TEST(LimitTest, AddOrderToLimit) {
 }
 
 TEST(LimitTest, FillUnits) {
-    auto order1 = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
-    auto order2 = std::make_shared<Order>(2, true, 200, 50, 123457, "AAPL");
+    auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
+    auto order2 = Order(2, true, 200, 50, 123457, "AAPL");
     Limit limit(order1);
     limit.addOrderToLimit(order2);
 
@@ -38,18 +38,18 @@ TEST(LimitTest, FillUnits) {
 }
 
 TEST(LimitTest, DecrementHeadOrder) {
-    auto order = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
+    auto order = Order(1, true, 100, 50, 123456, "AAPL");
     Limit limit(order);
 
     limit.decrementHeadOrder(50);
 
     EXPECT_EQ(limit.volume(), 50);
-    EXPECT_EQ(order->units, 50);
+    EXPECT_EQ(order.units, 100);
 }
 
 TEST(LimitTest, GetOrders) {
-    auto order1 = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
-    auto order2 = std::make_shared<Order>(2, true, 200, 50, 123457, "AAPL");
+    auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
+    auto order2 = Order(2, true, 200, 50, 123457, "AAPL");
     Limit limit(order1);
     limit.addOrderToLimit(order2);
 
@@ -61,8 +61,8 @@ TEST(LimitTest, GetOrders) {
 }
 
 TEST(LimitTest, FindOrder) {
-    auto order1 = std::make_shared<Order>(1, true, 100, 50, 123456, "AAPL");
-    auto order2 = std::make_shared<Order>(2, true, 200, 50, 123457, "AAPL");
+    auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
+    auto order2 = Order(2, true, 200, 50, 123457, "AAPL");
     Limit limit(order1);
     limit.addOrderToLimit(order2);
 

@@ -15,12 +15,15 @@ MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize, size_t RPPoolS
 	registerHandler<OrderRequest, int>([this](const OrderRequest& order){
 		return processOrderRequest(order);
 	});
+	registerHandler<OrderUpdateRequest, int>([this](const OrderUpdateRequest& orderUpdate){
+		return processOrderUpdateRequest(orderUpdate);
+	});
 }
 
 int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderRequest)
 {
-	std::shared_ptr<Order> order = Order::fromOrderRequest(orderRequest);
-	const std::string& security = order->security;
+	Order order = Order::fromOrderRequest(orderRequest);
+	const std::string& security = order.security;
 	
 	size_t threadIndex = getThreadForSecurity(security, threadPoolSize);
 
@@ -49,5 +52,10 @@ int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderReques
 		}
 	);
 
+	return 0;
+}
+
+int MatcherRequestProcessor::processOrderUpdateRequest(const OrderUpdateRequest& orderUpdateRequest)
+{
 	return 0;
 }

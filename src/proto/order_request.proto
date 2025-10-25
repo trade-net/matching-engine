@@ -8,3 +8,9 @@ message OrderRequest{
 	int32 timestamp = 5;
 	string security = 6;	
 }
+
+message OrderUpdateRequest{
+	int32 id = 1;
+	string security = 2;
+	int32 units = 3;
+}
