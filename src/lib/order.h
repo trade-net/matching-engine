@@ -39,6 +39,10 @@ public:
 		);
 	}
 
+	Order withUnits(int newUnits) const{
+		return Order(id, isBuy, newUnits, limit, timestamp, security);
+	}
+
 	int id;
 	bool isBuy;
 	int units;

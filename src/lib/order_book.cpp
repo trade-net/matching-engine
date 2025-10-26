@@ -5,7 +5,7 @@
 OrderBook::OrderBook(){}
 
 
-void OrderBook::addOrder(Order order)
+void OrderBook::addOrder(const Order& order)
 {
 	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
 		it->second->second.addOrderToLimit(order);
@@ -22,8 +22,7 @@ void OrderBook::addOrder(Order order)
 			limitMap[order.limit] = mapIt;
 			orderToLimitMap[order.id] = mapIt;
 		}
-	}	
-
+	}    
 }
 
 OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit)
@@ -101,7 +100,7 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	return false;
 }
 
-OrderStatus OrderBook::processOrder(Order order)
+OrderStatus OrderBook::processOrder(const Order& order)
 {
 	std::cout << "Processing order id=" << order.id
 		<< ", isBuy=" << order.isBuy
@@ -113,15 +112,13 @@ OrderStatus OrderBook::processOrder(Order order)
 
 	OrderStatus orderStatus = matchOrder(order.units, order.isBuy, order.limit);
 
-	// update remaining units in order
-	order.units = orderStatus.unitsUnfilled;
+	std::cout << "Order id=" << order.id << ": " << orderStatus.unitsUnfilled << " units remaining after matching" << std::endl;
 
-	std::cout << "Order id=" << order.id << ": " << order.units << " units remaining after matching" << std::endl;
-
-	if(order.units and order.limit)
+	if(orderStatus.unitsUnfilled && order.limit)
 	{
-		addOrder(order);
-		orderStatus.unitsInBook = order.units;
+		auto remainingOrder = order.withUnits(orderStatus.unitsUnfilled);
+		addOrder(remainingOrder);
+		orderStatus.unitsInBook = orderStatus.unitsUnfilled;
 	}
 
 	return orderStatus;

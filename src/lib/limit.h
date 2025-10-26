@@ -8,9 +8,9 @@
 
 class Limit{
 public:
-	Limit(Order order);
+	Limit(const Order& order);
 
-	void addOrderToLimit(Order order);
+	void addOrderToLimit(const Order& order);
 
 	int price() const{
 		return s_price;

@@ -42,8 +42,8 @@ struct OrderStatus{
 class OrderBook{
 public:
 	OrderBook();
-	OrderStatus processOrder(Order order);
-	void addOrder(Order order);
+	OrderStatus processOrder(const Order& order);
+	void addOrder(const Order& order);
 	OrderStatus matchOrder(int units, bool isBuy, int limit);
 
 	bool isActive(){
