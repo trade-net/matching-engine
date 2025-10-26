@@ -7,23 +7,22 @@ OrderBook::OrderBook(){}
 
 void OrderBook::addOrder(const Order& order, std::optional<int> remainingUnits)
 {
-    if(auto it = limitMap.find(order.limit); it != limitMap.end()){
-        it->second->second.addOrderToLimit(order, remainingUnits);
-        orderToLimitMap[order.id] = it->second;
-    }
-    else{
-        if(order.isBuy){
-            auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order, remainingUnits));
-            limitMap[order.limit] = mapIt;
-            orderToLimitMap[order.id] = mapIt;
-        }
-        else{
-            auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order, remainingUnits));
-            limitMap[order.limit] = mapIt;
-            orderToLimitMap[order.id] = mapIt;
-        }
-    }    
-
+	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
+		it->second->second.addOrderToLimit(order, remainingUnits);
+    	orderToLimitMap[order.id] = it->second;
+	}
+	else{
+		if(order.isBuy){
+			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order, remainingUnits));
+        	limitMap[order.limit] = mapIt;
+			orderToLimitMap[order.id] = mapIt;
+		}
+		else{
+			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order, remainingUnits));
+			limitMap[order.limit] = mapIt;
+			orderToLimitMap[order.id] = mapIt;
+		}
+	}    
 }
 
 OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit)
