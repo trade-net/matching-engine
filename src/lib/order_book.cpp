@@ -5,24 +5,24 @@
 OrderBook::OrderBook(){}
 
 
-void OrderBook::addOrder(Order order)
+void OrderBook::addOrder(const Order& order, std::optional<int> remainingUnits)
 {
-	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
-		it->second->second.addOrderToLimit(order);
-		orderToLimitMap[order.id] = it->second;
-	}
-	else{
-		if(order.isBuy){
-			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-		else{
-			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-	}	
+    if(auto it = limitMap.find(order.limit); it != limitMap.end()){
+        it->second->second.addOrderToLimit(order, remainingUnits);
+        orderToLimitMap[order.id] = it->second;
+    }
+    else{
+        if(order.isBuy){
+            auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order, remainingUnits));
+            limitMap[order.limit] = mapIt;
+            orderToLimitMap[order.id] = mapIt;
+        }
+        else{
+            auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order, remainingUnits));
+            limitMap[order.limit] = mapIt;
+            orderToLimitMap[order.id] = mapIt;
+        }
+    }    
 
 }
 
@@ -101,7 +101,7 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	return false;
 }
 
-OrderStatus OrderBook::processOrder(Order order)
+OrderStatus OrderBook::processOrder(const Order& order)
 {
 	std::cout << "Processing order id=" << order.id
 		<< ", isBuy=" << order.isBuy
@@ -113,15 +113,15 @@ OrderStatus OrderBook::processOrder(Order order)
 
 	OrderStatus orderStatus = matchOrder(order.units, order.isBuy, order.limit);
 
-	// update remaining units in order
-	order.units = orderStatus.unitsUnfilled;
+	std::cout << "Order id=" << order.id << ": " << orderStatus.unitsUnfilled << " units remaining after matching" << std::endl;
 
-	std::cout << "Order id=" << order.id << ": " << order.units << " units remaining after matching" << std::endl;
-
-	if(order.units and order.limit)
+	if(orderStatus.unitsUnfilled && order.limit)
 	{
-		addOrder(order);
-		orderStatus.unitsInBook = order.units;
+		// Create a new Order with remaining units
+		Order remainingOrder = order;
+		remainingOrder.units = orderStatus.unitsUnfilled;
+		addOrder(order, orderStatus.unitsUnfilled);
+		orderStatus.unitsInBook = orderStatus.unitsUnfilled;
 	}
 
 	return orderStatus;

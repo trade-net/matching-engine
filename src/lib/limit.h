@@ -8,9 +8,9 @@
 
 class Limit{
 public:
-	Limit(Order order);
+	Limit(const Order& order, std::optional<int> remainingUnits = std::nullopt);
 
-	void addOrderToLimit(Order order);
+	void addOrderToLimit(const Order& order, std::optional<int> remainingUnits = std::nullopt);
 
 	int price() const{
 		return s_price;
