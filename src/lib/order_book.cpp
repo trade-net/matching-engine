@@ -5,20 +5,20 @@
 OrderBook::OrderBook(){}
 
 
-void OrderBook::addOrder(const Order& order, std::optional<int> remainingUnits)
+void OrderBook::addOrder(const Order& order)
 {
 	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
-		it->second->second.addOrderToLimit(order, remainingUnits);
+		it->second->second.addOrderToLimit(order);
 		orderToLimitMap[order.id] = it->second;
 	}
 	else{
 		if(order.isBuy){
-			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order, remainingUnits));
+			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
 			limitMap[order.limit] = mapIt;
 			orderToLimitMap[order.id] = mapIt;
 		}
 		else{
-			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order, remainingUnits));
+			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
 			limitMap[order.limit] = mapIt;
 			orderToLimitMap[order.id] = mapIt;
 		}
@@ -116,7 +116,8 @@ OrderStatus OrderBook::processOrder(const Order& order)
 
 	if(orderStatus.unitsUnfilled && order.limit)
 	{
-		addOrder(order, orderStatus.unitsUnfilled);
+		auto remainingOrder = order.withUnits(orderStatus.unitsUnfilled);
+		addOrder(remainingOrder);
 		orderStatus.unitsInBook = orderStatus.unitsUnfilled;
 	}
 

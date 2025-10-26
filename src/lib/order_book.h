@@ -43,7 +43,7 @@ class OrderBook{
 public:
 	OrderBook();
 	OrderStatus processOrder(const Order& order);
-	void addOrder(const Order& order, std::optional<int> remainingUnits = std::nullopt);
+	void addOrder(const Order& order);
 	OrderStatus matchOrder(int units, bool isBuy, int limit);
 
 	bool isActive(){

@@ -1,28 +1,18 @@
 #include <limit.h>
 #include <iostream>
 
-Limit::Limit(const Order& order, std::optional<int> remainingUnits)
+Limit::Limit(const Order& order)
 : s_price(order.limit)
-, s_volume(remainingUnits.value_or(order.units))
+, s_volume(order.units)
 {
-	if(remainingUnits){
-		s_orders.emplace_back(order.withUnits(remainingUnits.value()));
-	}
-	else{
-		s_orders.emplace_back(order);
-	}
+	s_orders.emplace_back(order);
     s_orderMap[order.id] = s_orders.begin();
 }
 
-void Limit::addOrderToLimit(const Order& order, std::optional<int> remainingUnits)
+void Limit::addOrderToLimit(const Order& order)
 {
-	s_volume += remainingUnits.value_or(order.units);
-	if(remainingUnits){
-		s_orders.emplace_back(order.withUnits(remainingUnits.value()));
-	}
-	else{
-		s_orders.emplace_back(order);
-	}
+	s_volume += order.units;
+	s_orders.emplace_back(order);
     s_orderMap[order.id] = std::prev(s_orders.end());
 }
 
