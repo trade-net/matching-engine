@@ -117,9 +117,6 @@ OrderStatus OrderBook::processOrder(const Order& order)
 
 	if(orderStatus.unitsUnfilled && order.limit)
 	{
-		// Create a new Order with remaining units
-		Order remainingOrder = order;
-		remainingOrder.units = orderStatus.unitsUnfilled;
 		addOrder(order, orderStatus.unitsUnfilled);
 		orderStatus.unitsInBook = orderStatus.unitsUnfilled;
 	}
