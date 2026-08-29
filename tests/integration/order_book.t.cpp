@@ -40,7 +40,7 @@ public:
 
 TEST_F(OrderBookTest, testRemoveUnits){
 	Order order100 = Order(100, false, 7, 0, 100);
-	OrderStatus status= book.matchOrder(7, false, 0);
+	OrderStatus status= book.matchOrder(7, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 7);
 	EXPECT_EQ(status.priceFilled, 7*105);
@@ -49,7 +49,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_EQ(book.getHighestBuy(), 102);
 
 	Order order101 = Order(101, false, 20, 102, 101);
-	status= book.matchOrder(20, false, 102);
+	status= book.matchOrder(20, false, 102, false);
 	EXPECT_EQ(status.unitsUnfilled, 2);
 	EXPECT_EQ(status.unitsFilled, 18);
 	EXPECT_EQ(status.priceFilled, 18*102);
@@ -59,7 +59,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_FALSE(book.isLimitInMap(102));
 
 	Order order102 = Order(102, false, 15, 0, 102);
-	status= book.matchOrder(15, false, 0);
+	status= book.matchOrder(15, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 15);
 	EXPECT_EQ(status.priceFilled, 100*13 + 98*2);
@@ -71,7 +71,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_TRUE(book.isLimitInMap(98));
 
 	Order order103 = Order(103, false, 8, 0, 103);
-	status= book.matchOrder(8, false, 0);
+	status= book.matchOrder(8, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 8);
 	EXPECT_EQ(status.priceFilled, 98*8);
@@ -80,7 +80,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_FALSE(book.isLimitInMap(98));
 
 	Order order104 = Order(104, false, 20, 96, 104);
-	status= book.matchOrder(20, false, 96);
+	status= book.matchOrder(20, false, 96, false);
 	EXPECT_EQ(status.unitsUnfilled, 4);
 	EXPECT_EQ(status.unitsFilled, 16);
 	EXPECT_EQ(status.priceFilled, 97*3 + 96*13);
@@ -91,7 +91,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 	EXPECT_FALSE(book.isLimitInMap(96));
 
 	Order order105 = Order(105, false, 40, 0, 105);
-	status= book.matchOrder(40, false, 0);
+	status= book.matchOrder(40, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 9);
 	EXPECT_EQ(status.unitsFilled, 31);
 	EXPECT_EQ(status.priceFilled, 31*95);
@@ -103,7 +103,7 @@ TEST_F(OrderBookTest, testRemoveUnits){
 TEST_F(OrderBookTest, testRemoveAndAddUnits)
 {
 	Order order100 = Order(100, false, 7, 0, 100);
-	OrderStatus status = book.matchOrder(7, false, 0);
+	OrderStatus status = book.matchOrder(7, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 7);
 	EXPECT_EQ(status.priceFilled, 7*105);
@@ -112,7 +112,7 @@ TEST_F(OrderBookTest, testRemoveAndAddUnits)
 	EXPECT_EQ(book.getHighestBuy(), 102);
 
 	Order order101 = Order(101, false, 5, 102, 101);
-	status= book.matchOrder(5, false, 102);
+	status= book.matchOrder(5, false, 102, false);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 5);
 	EXPECT_EQ(status.priceFilled, 102*5);
@@ -122,7 +122,7 @@ TEST_F(OrderBookTest, testRemoveAndAddUnits)
 	EXPECT_TRUE(book.isLimitInMap(102));
 
 	Order order102 = Order(102, false, 1, 0, 102);
-	status= book.matchOrder(1, false, 0);
+	status= book.matchOrder(1, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 1);
 	EXPECT_EQ(status.priceFilled, 102);
@@ -138,7 +138,7 @@ TEST_F(OrderBookTest, testRemoveAndAddUnits)
 	EXPECT_TRUE(book.isOrderInMap(103));
 
 	Order order104 = Order(104, false, 20, 103, 104);
-	status = book.matchOrder(20, false, 103);
+	status = book.matchOrder(20, false, 103, false);
 	EXPECT_EQ(status.unitsUnfilled, 12);
 	EXPECT_EQ(status.unitsFilled, 8);
 	EXPECT_EQ(status.priceFilled, 104*8);
@@ -154,7 +154,7 @@ TEST_F(OrderBookTest, testRemoveAndAddUnits)
 	EXPECT_TRUE(book.isOrderInMap(103));
 
 	Order order105 = Order(105, false, 20, 100, 105);
-	status = book.matchOrder(20, false, 100);
+	status = book.matchOrder(20, false, 100, false);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 20);
 	EXPECT_EQ(status.priceFilled, 104*8 + 102*12);
@@ -165,7 +165,7 @@ TEST_F(OrderBookTest, testRemoveAndAddUnits)
 	EXPECT_FALSE(book.isLimitInMap(102));
 
 	Order order106 = Order(106, false, 15, 0, 106);
-	status = book.matchOrder(15, false, 0);
+	status = book.matchOrder(15, false, 0, true);
 	EXPECT_EQ(status.unitsUnfilled, 0);
 	EXPECT_EQ(status.unitsFilled, 15);
 	EXPECT_EQ(status.priceFilled, 100*13 + 98*2);

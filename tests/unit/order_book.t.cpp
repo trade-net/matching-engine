@@ -80,3 +80,49 @@ TEST(OrderBookTest, AddAfterPartialMatchTest) {
     EXPECT_TRUE(orderBook.isOrderInMap(2));
     EXPECT_TRUE(orderBook.isLimitInMap(100));
 }
+
+TEST(OrderBookTest, TimePriorityWithinPriceLevelTest) {
+    OrderBook orderBook;
+
+    // two resting buy orders at the same price; earlier timestamp should fill first
+    auto firstBuy = Order(1, true, 5, 100, 1, "AAPL");
+    auto secondBuy = Order(2, true, 5, 100, 2, "AAPL");
+
+    orderBook.addOrder(firstBuy);
+    orderBook.addOrder(secondBuy);
+
+    auto sellOrder = Order(3, false, 5, 100, 3, "AAPL");
+    auto status = orderBook.processOrder(sellOrder);
+
+    EXPECT_EQ(status.unitsFilled, 5);
+    EXPECT_FALSE(orderBook.isOrderInMap(1));
+    EXPECT_TRUE(orderBook.isOrderInMap(2));
+}
+
+TEST(OrderBookTest, MarketBuyOrderMatchesTest) {
+    OrderBook orderBook;
+
+    auto sellOrder = Order(1, false, 10, 100, 1, "AAPL");
+    auto marketBuyOrder = Order(2, true, 5, 0, 2, "AAPL", /*isMarket=*/true);
+
+    orderBook.addOrder(sellOrder);
+    auto status = orderBook.processOrder(marketBuyOrder);
+
+    EXPECT_EQ(status.unitsFilled, 5);
+    EXPECT_EQ(status.unitsUnfilled, 0);
+    EXPECT_EQ(status.priceFilled, 500);
+    EXPECT_FALSE(orderBook.isOrderInMap(2));
+}
+
+TEST(OrderBookTest, UnfilledMarketOrderDoesNotRestTest) {
+    OrderBook orderBook;
+
+    auto marketBuyOrder = Order(1, true, 5, 0, 1, "AAPL", /*isMarket=*/true);
+    auto status = orderBook.processOrder(marketBuyOrder);
+
+    EXPECT_EQ(status.unitsFilled, 0);
+    EXPECT_EQ(status.unitsUnfilled, 5);
+    EXPECT_EQ(status.unitsInBook, 0);
+    EXPECT_FALSE(orderBook.isOrderInMap(1));
+    EXPECT_FALSE(orderBook.isActive());
+}

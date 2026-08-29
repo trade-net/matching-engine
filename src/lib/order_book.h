@@ -4,6 +4,7 @@
 #include <limit.h>
 #include <order.h>
 
+#include <cstdint>
 #include <unordered_map>
 #include <memory>
 
@@ -16,19 +17,17 @@ struct OrderStatus{
 	, priceFilled(0)
 	{}
 
-	OrderStatus();
-
 	void fill(int units, int price)
 	{
 		unitsFilled += units;
-		priceFilled += units*price;
+		priceFilled += static_cast<int64_t>(units) * price;
 		unitsUnfilled -= units;
 	}
 
 	void fillRemaining(int price)
 	{
 		unitsFilled += unitsUnfilled;
-		priceFilled += unitsUnfilled*price;
+		priceFilled += static_cast<int64_t>(unitsUnfilled) * price;
 		unitsUnfilled = 0;
 	}
 
@@ -36,7 +35,7 @@ struct OrderStatus{
 	int unitsUnfilled;
 	int unitsInBook;
 	int unitsFilled;
-	int priceFilled;
+	int64_t priceFilled;
 };
 
 class OrderBook{
@@ -44,7 +43,7 @@ public:
 	OrderBook();
 	OrderStatus processOrder(const Order& order);
 	void addOrder(const Order& order);
-	OrderStatus matchOrder(int units, bool isBuy, int limit);
+	OrderStatus matchOrder(int units, bool isBuy, int limit, bool isMarket);
 
 	bool isActive(){
 		return !buyTree.empty() or !sellTree.empty();

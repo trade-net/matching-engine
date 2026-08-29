@@ -8,13 +8,14 @@ class Limit; //forward declaration
 
 class Order{
 public:
-	Order(int id, bool isBuy, int units, int limit, int timestamp, const std::string& security)
+	Order(int id, bool isBuy, int units, int limit, int timestamp, const std::string& security, bool isMarket = false)
 	: id(id)
 	, isBuy(isBuy)
 	, units(units)
 	, limit(limit)
 	, timestamp(timestamp)
 	, security(security)
+	, isMarket(isMarket)
 	{}
 
 	// to be deleted eventually, for testing only
@@ -25,6 +26,7 @@ public:
 	, limit(limit)
 	, timestamp(timestamp)
 	, security("")
+	, isMarket(false)
 	{}
 
 	static Order fromOrderRequest(const OrderRequest& orderRequest)
@@ -35,12 +37,13 @@ public:
 			orderRequest.units(),
 			orderRequest.limit(),
 			orderRequest.timestamp(),
-			orderRequest.security()
+			orderRequest.security(),
+			orderRequest.is_market()
 		);
 	}
 
 	Order withUnits(int newUnits) const{
-		return Order(id, isBuy, newUnits, limit, timestamp, security);
+		return Order(id, isBuy, newUnits, limit, timestamp, security, isMarket);
 	}
 
 	int id;
@@ -49,6 +52,7 @@ public:
 	int limit;
 	int timestamp;
 	std::string security;
+	bool isMarket;
 };
 
 #endif

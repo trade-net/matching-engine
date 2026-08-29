@@ -1,5 +1,5 @@
 #include <limit.h>
-#include <iostream>
+#include <logger.h>
 
 Limit::Limit(const Order& order)
 : s_price(order.limit)
@@ -22,7 +22,7 @@ std::vector<int> Limit::fillUnits(int units)
 	while(units){
 		auto& head = s_orders.front();
 		if(units >= head.units){
-			std::cout << "Filling order id=" << head.id << " for " << head.units << " units" << std::endl;
+			LOG_INFO("Filling order id=" << head.id << " for " << head.units << " units");
 			units -= head.units;
 			s_volume -= head.units;
 
