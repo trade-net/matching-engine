@@ -19,6 +19,7 @@ void sendOrders(const std::vector<nlohmann::json>& orders, const std::string& ip
             order.set_limit(orderJson["limit"]);
             order.set_timestamp(orderJson["timestamp"]);
             order.set_security(orderJson["security"]);
+            order.set_is_market(orderJson.value("is_market", false));
 
             std::string response = client.send(order.SerializeAsString());
             std::cout << "Response for Order ID " << order.id() << ": " << response << std::endl;

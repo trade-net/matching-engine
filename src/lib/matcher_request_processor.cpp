@@ -7,8 +7,8 @@ size_t getThreadForSecurity(const std::string& security, size_t poolSize)
 	return hasher(security) % poolSize;
 }
 
-MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize, size_t RPPoolSize)
-: RequestProcessor(RPPoolSize)
+MatcherRequestProcessor::MatcherRequestProcessor(size_t poolSize)
+: orderBooks(poolSize)
 , threadPool(poolSize)
 , threadPoolSize(poolSize)
 {
@@ -29,25 +29,15 @@ int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderReques
 
 	threadPool.enqueue(
 		threadIndex,
-		[this, security, order](){
-			OrderBook* book = nullptr;
-			{
-				std::unique_lock<std::mutex> lock(orderBooksMutex);
-				auto it = orderBooks.find(security);
-				if(it == orderBooks.end())
-				{
-					orderBooks.insert(std::pair<std::string, OrderBook>(security, OrderBook()));
-					it = orderBooks.find(security);
-				}
-				book = &it->second;
-			}
+		[this, threadIndex, security, order](){
+			auto& books = orderBooks[threadIndex];
+			OrderBook& book = books.try_emplace(security).first->second;
 
-			OrderStatus status = book->processOrder(order);
+			OrderStatus status = book.processOrder(order);
 
-			if(!book->isActive())
+			if(!book.isActive())
 			{
-				std::unique_lock<std::mutex> lock(orderBooksMutex);
-				orderBooks.erase(security);
+				books.erase(security);
 			}
 		}
 	);

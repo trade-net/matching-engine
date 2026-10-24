@@ -8,6 +8,9 @@ PartitionedThreadPool::PartitionedThreadPool(size_t numThreads)
 	conditions.resize(numThreads);
 	for(size_t i = 0; i < numThreads; ++i)
 	{
+		queueMutexes[i] = std::make_unique<std::mutex>();
+		conditions[i] = std::make_unique<std::condition_variable>();
+
 		workers.emplace_back([this, i] {
 			try{
 				while(true)
@@ -36,10 +39,6 @@ PartitionedThreadPool::PartitionedThreadPool(size_t numThreads)
 				std::cerr << "Unknown exception in thread " << i << std::endl;
 			}
 		});
-
-		queueMutexes[i] = std::make_unique<std::mutex>();
-		conditions[i] = std::make_unique<std::condition_variable>();
-
 	}
 }
 

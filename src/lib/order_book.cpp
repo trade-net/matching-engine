@@ -1,5 +1,5 @@
 #include <order_book.h>
-#include <iostream>
+#include <logger.h>
 
 
 OrderBook::OrderBook(){}
@@ -8,40 +8,42 @@ OrderBook::OrderBook(){}
 void OrderBook::addOrder(const Order& order)
 {
 	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
-		it->second->second.addOrderToLimit(order);
+		it->second->addOrderToLimit(order);
 		orderToLimitMap[order.id] = it->second;
+		return;
+	}
+
+	Limit* limit;
+	if(order.isBuy){
+		auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
+		limit = &mapIt->second;
 	}
 	else{
-		if(order.isBuy){
-			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-		else{
-			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-	}    
+		auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
+		limit = &mapIt->second;
+	}
+
+	limitMap[order.limit] = limit;
+	orderToLimitMap[order.id] = limit;
 }
 
-OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit)
+OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit, bool isMarket)
 {
 	OrderStatus orderStatus(units);
 	if(!isBuy)
 	{
-		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
+		for(auto it=buyTree.begin(); it != buyTree.end();)
 		{
 			if(
-				orderStatus.unitsUnfilled == 0 or 
-				it->first < limit or
+				orderStatus.unitsUnfilled == 0 or
+				(!isMarket and it->first < limit) or
 				!matchWithLimit(orderStatus, it->second)
 			){
 				break;
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			it = std::make_reverse_iterator(buyTree.erase(std::prev(it.base())));
+			it = buyTree.erase(it);
 		}
 	}
 	else
@@ -50,7 +52,7 @@ OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or
-				it->first > limit or
+				(!isMarket and it->first > limit) or
 				!matchWithLimit(orderStatus, it->second)
 			){
 				break;
@@ -69,10 +71,9 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	// remove the whole limit from the tree
 	if(orderStatus.unitsUnfilled >= current.volume())
 	{
-		std::cout << "Incoming order matched all orders at limit=" << current.price()
+		LOG_INFO("Incoming order matched all orders at limit=" << current.price()
 			<< ", size=" << current.size()
-			<< ", volume=" << current.volume()
-			<< std::endl;
+			<< ", volume=" << current.volume());
 
 		for(auto& id : current.getOrders())
 		{
@@ -84,12 +85,11 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	}
 
 	// if not, remove the remaining units from the current limit
-	std::cout << "Incoming order partial match with limit=" << current.price()
+	LOG_INFO("Incoming order partial match with limit=" << current.price()
 		<< ", size=" << current.size()
 		<< ", volume=" << current.volume()
-		<< ": units matched = " << orderStatus.unitsUnfilled
-		<< std::endl;
-	
+		<< ": units matched = " << orderStatus.unitsUnfilled);
+
 	auto ordersToDelete = current.fillUnits(orderStatus.unitsUnfilled);
 	for(auto& id : ordersToDelete)
 	{
@@ -100,21 +100,45 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	return false;
 }
 
+bool OrderBook::cancelOrder(int id)
+{
+	auto it = orderToLimitMap.find(id);
+	if(it == orderToLimitMap.end()){
+		return false;
+	}
+
+	Limit* limit = it->second;
+	bool isBuy = limit->isBuy();
+	int price = limit->price();
+
+	limit->removeOrder(id);
+	orderToLimitMap.erase(it);
+
+	if(limit->size() == 0){
+		limitMap.erase(price);
+		if(isBuy) buyTree.erase(price);
+		else sellTree.erase(price);
+	}
+
+	return true;
+}
+
 OrderStatus OrderBook::processOrder(const Order& order)
 {
-	std::cout << "Processing order id=" << order.id
+	LOG_INFO("Processing order id=" << order.id
 		<< ", isBuy=" << order.isBuy
 		<< ", units=" << order.units
 		<< ", limit=" << order.limit
+		<< ", isMarket=" << order.isMarket
 		<< ", timestamp=" << order.timestamp
-		<< ", security=" << order.security
-		<< std::endl;
+		<< ", security=" << order.security);
 
-	OrderStatus orderStatus = matchOrder(order.units, order.isBuy, order.limit);
+	OrderStatus orderStatus = matchOrder(order.units, order.isBuy, order.limit, order.isMarket);
 
-	std::cout << "Order id=" << order.id << ": " << orderStatus.unitsUnfilled << " units remaining after matching" << std::endl;
+	LOG_INFO("Order id=" << order.id << ": " << orderStatus.unitsUnfilled << " units remaining after matching");
 
-	if(orderStatus.unitsUnfilled && order.limit)
+	// market orders never rest on the book: unfilled units are dropped
+	if(orderStatus.unitsUnfilled && !order.isMarket)
 	{
 		auto remainingOrder = order.withUnits(orderStatus.unitsUnfilled);
 		addOrder(remainingOrder);

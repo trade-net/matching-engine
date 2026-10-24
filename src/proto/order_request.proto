@@ -6,7 +6,8 @@ message OrderRequest{
 	int32 units = 3;
 	int32 limit = 4;
 	int32 timestamp = 5;
-	string security = 6;	
+	string security = 6;
+	bool is_market = 7;
 }
 
 message OrderUpdateRequest{

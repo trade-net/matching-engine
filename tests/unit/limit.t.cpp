@@ -60,6 +60,28 @@ TEST(LimitTest, GetOrders) {
     EXPECT_NE(std::find(orders.begin(), orders.end(), 2), orders.end());
 }
 
+TEST(LimitTest, RemoveOrder) {
+    auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
+    auto order2 = Order(2, true, 200, 50, 123457, "AAPL");
+    Limit limit(order1);
+    limit.addOrderToLimit(order2);
+
+    limit.removeOrder(1);
+
+    EXPECT_EQ(limit.volume(), 200);
+    EXPECT_EQ(limit.size(), 1);
+    EXPECT_FALSE(limit.find(1));
+    EXPECT_TRUE(limit.find(2));
+}
+
+TEST(LimitTest, IsBuy) {
+    auto buyOrder = Order(1, true, 100, 50, 123456, "AAPL");
+    auto sellOrder = Order(2, false, 100, 50, 123456, "AAPL");
+
+    EXPECT_TRUE(Limit(buyOrder).isBuy());
+    EXPECT_FALSE(Limit(sellOrder).isBuy());
+}
+
 TEST(LimitTest, FindOrder) {
     auto order1 = Order(1, true, 100, 50, 123456, "AAPL");
     auto order2 = Order(2, true, 200, 50, 123457, "AAPL");

@@ -12,16 +12,16 @@
 
 class MatcherRequestProcessor: public network::RequestProcessor{
 public:
-	MatcherRequestProcessor(size_t poolSize, size_t RPPoolSize);
+	explicit MatcherRequestProcessor(size_t poolSize);
 	int processOrderRequest(const OrderRequest& order);
 	int processOrderUpdateRequest(const OrderUpdateRequest& orderUpdateRequest);
 
 private:
-	std::unordered_map<std::string, OrderBook> orderBooks;
+	// one map per partition, only ever touched by that partition's thread.
+	// Declared before threadPool so the threads are joined before the books go away.
+	std::vector<std::unordered_map<std::string, OrderBook>> orderBooks;
 	PartitionedThreadPool threadPool;
 	size_t threadPoolSize;
-
-	std::mutex orderBooksMutex;
 };
 
 #endif

@@ -5,12 +5,14 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include <unordered_map>
 
 class Limit{
 public:
 	Limit(const Order& order);
 
 	void addOrderToLimit(const Order& order);
+	void removeOrder(int id);
 
 	int price() const{
 		return s_price;
@@ -22,6 +24,10 @@ public:
 
 	int volume() const{
 		return s_volume;
+	}
+
+	bool isBuy() const{
+		return s_isBuy;
 	}
 
 	void decrementHeadOrder(int units);
@@ -45,6 +51,7 @@ public:
 private:
 	int s_price;
 	int s_volume; // number of units
+	bool s_isBuy;
 	std::list<Order> s_orders;
 	std::unordered_map<int, std::list<Order>::iterator> s_orderMap;
 };
