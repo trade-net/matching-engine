@@ -147,3 +147,26 @@ OrderStatus OrderBook::processOrder(const Order& order)
 
 	return orderStatus;
 }
+
+namespace{
+
+template <typename Tree>
+void copyTopLevels(const Tree& tree, size_t depth, std::vector<LevelSnapshot>& out)
+{
+	for(auto it = tree.begin(); it != tree.end() && out.size() < depth; ++it){
+		out.push_back({it->first, it->second.volume(), it->second.size()});
+	}
+}
+
+} // namespace
+
+BookSnapshot OrderBook::snapshot(size_t depth) const
+{
+	BookSnapshot snap;
+	copyTopLevels(buyTree, depth, snap.bids);
+	copyTopLevels(sellTree, depth, snap.asks);
+	snap.bidLevels = buyTree.size();
+	snap.askLevels = sellTree.size();
+	snap.restingOrders = orderToLimitMap.size();
+	return snap;
+}

@@ -1,6 +1,7 @@
 #ifndef INCLUDED_ORDER_BOOK
 #define INCLUDED_ORDER_BOOK
 
+#include <book_snapshot.h>
 #include <limit.h>
 #include <order.h>
 
@@ -62,6 +63,10 @@ public:
 		auto it = orderToLimitMap.find(id);
 		return it != orderToLimitMap.end() and it->second->find(id);
 	}
+
+	// Copies the top `depth` levels of each side plus book-wide totals.
+	// Not thread-safe: call it from the thread that owns this book.
+	BookSnapshot snapshot(size_t depth) const;
 
 	std::optional<int> getHighestBuy() const{
 		if(buyTree.empty()) return std::nullopt;

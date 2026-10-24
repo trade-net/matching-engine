@@ -1,4 +1,5 @@
 #include <matcher_request_processor.h>
+#include <future>
 #include <memory>
 
 size_t getThreadForSecurity(const std::string& security, size_t poolSize)
@@ -34,6 +35,7 @@ int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderReques
 			OrderBook& book = books.try_emplace(security).first->second;
 
 			OrderStatus status = book.processOrder(order);
+			s_ordersProcessed.fetch_add(1, std::memory_order_relaxed);
 
 			if(!book.isActive())
 			{
@@ -48,4 +50,32 @@ int MatcherRequestProcessor::processOrderRequest(const OrderRequest& orderReques
 int MatcherRequestProcessor::processOrderUpdateRequest(const OrderUpdateRequest& orderUpdateRequest)
 {
 	return 0;
+}
+
+std::map<std::string, BookSnapshot> MatcherRequestProcessor::snapshotAll(size_t depth)
+{
+	using Result = std::map<std::string, BookSnapshot>;
+
+	std::vector<std::future<Result>> futures;
+	for(size_t i = 0; i < threadPoolSize; ++i)
+	{
+		auto promise = std::make_shared<std::promise<Result>>();
+		futures.push_back(promise->get_future());
+
+		threadPool.enqueue(i, [this, i, depth, promise](){
+			Result result;
+			for(const auto& [security, book] : orderBooks[i])
+			{
+				result.emplace(security, book.snapshot(depth));
+			}
+			promise->set_value(std::move(result));
+		});
+	}
+
+	Result all;
+	for(auto& future : futures)
+	{
+		all.merge(future.get());
+	}
+	return all;
 }

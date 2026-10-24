@@ -170,3 +170,39 @@ TEST(OrderBookTest, UnfilledMarketOrderDoesNotRestTest) {
     EXPECT_FALSE(orderBook.isOrderInMap(1));
     EXPECT_FALSE(orderBook.isActive());
 }
+
+TEST(OrderBookTest, SnapshotTest) {
+    OrderBook orderBook;
+
+    orderBook.addOrder(Order(1, true, 10, 100, 1, "AAPL"));
+    orderBook.addOrder(Order(2, true, 5, 100, 2, "AAPL"));
+    orderBook.addOrder(Order(3, true, 7, 99, 3, "AAPL"));
+    orderBook.addOrder(Order(4, false, 4, 102, 4, "AAPL"));
+    orderBook.addOrder(Order(5, false, 6, 103, 5, "AAPL"));
+
+    auto snap = orderBook.snapshot(1);
+
+    EXPECT_EQ(snap.bestBid(), 100);
+    EXPECT_EQ(snap.bestAsk(), 102);
+    EXPECT_EQ(snap.spread(), 2);
+    EXPECT_EQ(snap.restingOrders, 5u);
+    EXPECT_EQ(snap.bidLevels, 2u);
+    EXPECT_EQ(snap.askLevels, 2u);
+
+    // depth truncates the ladder but not the book-wide totals
+    ASSERT_EQ(snap.bids.size(), 1u);
+    EXPECT_EQ(snap.bids[0].volume, 15);
+    EXPECT_EQ(snap.bids[0].orders, 2);
+    EXPECT_EQ(snap.asks.size(), 1u);
+}
+
+TEST(OrderBookTest, SnapshotOfOneSidedBookHasNoSpread) {
+    OrderBook orderBook;
+    orderBook.addOrder(Order(1, true, 10, 100, 1, "AAPL"));
+
+    auto snap = orderBook.snapshot(5);
+
+    EXPECT_EQ(snap.bestBid(), 100);
+    EXPECT_FALSE(snap.bestAsk().has_value());
+    EXPECT_FALSE(snap.spread().has_value());
+}
