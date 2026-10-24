@@ -114,6 +114,50 @@ TEST(OrderBookTest, MarketBuyOrderMatchesTest) {
     EXPECT_FALSE(orderBook.isOrderInMap(2));
 }
 
+TEST(OrderBookTest, CancelOrderRemovesRestingOrderTest) {
+    OrderBook orderBook;
+
+    auto order = Order(1, true, 10, 100, 1, "AAPL");
+    orderBook.addOrder(order);
+
+    EXPECT_TRUE(orderBook.cancelOrder(1));
+    EXPECT_FALSE(orderBook.isOrderInMap(1));
+    EXPECT_FALSE(orderBook.isLimitInMap(100));
+    EXPECT_FALSE(orderBook.isActive());
+}
+
+TEST(OrderBookTest, CancelOrderLeavesRestOfLimitIntactTest) {
+    OrderBook orderBook;
+
+    auto firstBuy = Order(1, true, 5, 100, 1, "AAPL");
+    auto secondBuy = Order(2, true, 5, 100, 2, "AAPL");
+    orderBook.addOrder(firstBuy);
+    orderBook.addOrder(secondBuy);
+
+    EXPECT_TRUE(orderBook.cancelOrder(1));
+    EXPECT_FALSE(orderBook.isOrderInMap(1));
+    EXPECT_TRUE(orderBook.isOrderInMap(2));
+    EXPECT_TRUE(orderBook.isLimitInMap(100));
+
+    auto sellOrder = Order(3, false, 5, 100, 3, "AAPL");
+    auto status = orderBook.processOrder(sellOrder);
+
+    EXPECT_EQ(status.unitsFilled, 5);
+}
+
+TEST(OrderBookTest, CancelUnknownOrderReturnsFalseTest) {
+    OrderBook orderBook;
+
+    EXPECT_FALSE(orderBook.cancelOrder(999));
+}
+
+TEST(OrderBookTest, BestPriceIsEmptyOnEmptyBookTest) {
+    OrderBook orderBook;
+
+    EXPECT_FALSE(orderBook.getHighestBuy().has_value());
+    EXPECT_FALSE(orderBook.getLowestSell().has_value());
+}
+
 TEST(OrderBookTest, UnfilledMarketOrderDoesNotRestTest) {
     OrderBook orderBook;
 

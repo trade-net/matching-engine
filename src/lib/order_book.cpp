@@ -8,21 +8,23 @@ OrderBook::OrderBook(){}
 void OrderBook::addOrder(const Order& order)
 {
 	if(auto it = limitMap.find(order.limit); it != limitMap.end()){
-		it->second->second.addOrderToLimit(order);
+		it->second->addOrderToLimit(order);
 		orderToLimitMap[order.id] = it->second;
+		return;
+	}
+
+	Limit* limit;
+	if(order.isBuy){
+		auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
+		limit = &mapIt->second;
 	}
 	else{
-		if(order.isBuy){
-			auto [mapIt, _] = buyTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-		else{
-			auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
-			limitMap[order.limit] = mapIt;
-			orderToLimitMap[order.id] = mapIt;
-		}
-	}    
+		auto [mapIt, _] = sellTree.emplace(order.limit, Limit(order));
+		limit = &mapIt->second;
+	}
+
+	limitMap[order.limit] = limit;
+	orderToLimitMap[order.id] = limit;
 }
 
 OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit, bool isMarket)
@@ -30,7 +32,7 @@ OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit, bool isMarke
 	OrderStatus orderStatus(units);
 	if(!isBuy)
 	{
-		for(auto it=buyTree.rbegin(); it != buyTree.rend();)
+		for(auto it=buyTree.begin(); it != buyTree.end();)
 		{
 			if(
 				orderStatus.unitsUnfilled == 0 or
@@ -41,7 +43,7 @@ OrderStatus OrderBook::matchOrder(int units, bool isBuy, int limit, bool isMarke
 			}
 
 			// remove the limit from the tree and map, clean up memory
-			it = std::make_reverse_iterator(buyTree.erase(std::prev(it.base())));
+			it = buyTree.erase(it);
 		}
 	}
 	else
@@ -96,6 +98,29 @@ bool OrderBook::matchWithLimit(OrderStatus& orderStatus, Limit& current)
 	orderStatus.fillRemaining(current.price());
 
 	return false;
+}
+
+bool OrderBook::cancelOrder(int id)
+{
+	auto it = orderToLimitMap.find(id);
+	if(it == orderToLimitMap.end()){
+		return false;
+	}
+
+	Limit* limit = it->second;
+	bool isBuy = limit->isBuy();
+	int price = limit->price();
+
+	limit->removeOrder(id);
+	orderToLimitMap.erase(it);
+
+	if(limit->size() == 0){
+		limitMap.erase(price);
+		if(isBuy) buyTree.erase(price);
+		else sellTree.erase(price);
+	}
+
+	return true;
 }
 
 OrderStatus OrderBook::processOrder(const Order& order)

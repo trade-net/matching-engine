@@ -5,8 +5,11 @@
 #include <order.h>
 
 #include <cstdint>
-#include <unordered_map>
+#include <functional>
+#include <map>
 #include <memory>
+#include <optional>
+#include <unordered_map>
 
 struct OrderStatus{
 	OrderStatus(int units)
@@ -44,6 +47,7 @@ public:
 	OrderStatus processOrder(const Order& order);
 	void addOrder(const Order& order);
 	OrderStatus matchOrder(int units, bool isBuy, int limit, bool isMarket);
+	bool cancelOrder(int id);
 
 	bool isActive(){
 		return !buyTree.empty() or !sellTree.empty();
@@ -51,32 +55,32 @@ public:
 
 	// for testing
 	bool isLimitInMap(int limit){
-		auto it = limitMap.find(limit);
-		return it != limitMap.end();
+		return limitMap.find(limit) != limitMap.end();
 	}
 
 	bool isOrderInMap(int id){
-		if(auto it = orderToLimitMap.find(id); it != orderToLimitMap.end()){
-			return it->second->second.find(id);
-		}
-
-		return false;
+		auto it = orderToLimitMap.find(id);
+		return it != orderToLimitMap.end() and it->second->find(id);
 	}
 
-	int getHighestBuy() const{
-		return buyTree.rbegin()->first;
+	std::optional<int> getHighestBuy() const{
+		if(buyTree.empty()) return std::nullopt;
+		return buyTree.begin()->first;
 	}
 
-	int getLowestSell() const{
+	std::optional<int> getLowestSell() const{
+		if(sellTree.empty()) return std::nullopt;
 		return sellTree.begin()->first;
 	}
 
 private:
-	std::map<int, Limit> buyTree;
+	// buyTree sorted highest price first so both sides can be matched
+	// and iterated front-to-back the same way
+	std::map<int, Limit, std::greater<int>> buyTree;
 	std::map<int, Limit> sellTree;
 
-	std::unordered_map<int, std::map<int, Limit>::iterator> limitMap;
-	std::unordered_map<int, std::map<int, Limit>::iterator> orderToLimitMap;
+	std::unordered_map<int, Limit*> limitMap;
+	std::unordered_map<int, Limit*> orderToLimitMap;
 
 	// match orderStatus.unfilledOrders with orders in the current Limit
 	// returns true if all orders in current is matched, false otherwise
